@@ -23,11 +23,11 @@ export interface Course {
   assignments: Assignment[]
 }
 
-export interface SkywardData {
+export interface AcademicData {
   currentTerm: string;     // e.g., "Q3"
   availableTerms: string[]; // e.g., ["Q1", "Q2", "S1", "Q3", "Q4", "S2", "FIN"]
   courses: Course[];
-  // Future-proofing:
+  //future proofing:
   studentName?: string;
   gpa?: number;
 }

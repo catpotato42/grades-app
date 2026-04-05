@@ -1,12 +1,14 @@
-import { Theme } from '../styles/theme';
+import { useTheme } from '../styles/theme';
 
-export const getGradeColor = (num?: number) => {
-    if (num === undefined || num === null) return Theme.colors.buttonSecondary; //grey if no grade
-    if (num >= 90) return Theme.colors.gradeGreen;
-    if (num >= 80) return Theme.colors.gradeBlue;
-    if (num >= 70) return Theme.colors.gradeYellow;
-    if (num >= 60) return Theme.colors.gradeOrange;
-    return Theme.colors.gradeRed;
+export const useGradeColor = (num: number | undefined) => {
+    const theme = useTheme();
+
+    if (num === undefined || num === null) return theme.colors.buttonSecondary; //grey if no grade
+    if (num >= 90) return theme.colors.gradeGreen;
+    if (num >= 80) return theme.colors.gradeBlue;
+    if (num >= 70) return theme.colors.gradeYellow;
+    if (num >= 60) return theme.colors.gradeOrange;
+    return theme.colors.gradeRed;
 };
 
 export const formatGrade = (val: any) => val ?? "—";

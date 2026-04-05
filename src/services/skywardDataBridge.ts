@@ -1,14 +1,15 @@
-import { MOCK_DATA } from '../data/mockGrades'; // Make sure your path is correct
-import { SkywardData } from '../types'; // Import the new wrapper type from your index.ts
+import { MOCK_DATA } from '../data/mockGrades';
+import { AcademicData } from '../types';
 
 export const SkywardDataBridge = {
   //fetches from mock courses for now, scraper later
-  async login(username: string, password: string): Promise<SkywardData> {
+  async login(state: string, district: string, username: string, password: string): Promise<AcademicData> {
     return new Promise((resolve, reject) => {
+      //state and district doesn't matter for now
       //Simulating some time for the scraper to parse and return html
       setTimeout(() => {
-        if (username === 'test' && password === '123') {
-          resolve(MOCK_DATA); // <-- Returning the new object here
+        if (username === 'test' && password === '1') {
+          resolve(MOCK_DATA);
         } else {
           reject(new Error('Invalid Skyward credentials. Please try again.'));
         }
@@ -17,7 +18,7 @@ export const SkywardDataBridge = {
   },
 
   //useful for pull to refresh
-  async refreshData(): Promise<SkywardData> {
+  async refreshData(): Promise<AcademicData> {
     // Logic for re-triggering the scraper would go here
     return new Promise((resolve) => {
       setTimeout(() => {

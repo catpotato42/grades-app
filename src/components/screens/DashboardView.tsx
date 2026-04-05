@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, FlatList, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Theme } from '../../styles/theme';
+import { useTheme } from '../../styles/theme';
 import { AppSettings } from '../../config/settings';
-import CourseCard, { cardPadding } from '../elements/CourseCard';
-import { SkywardData, Course } from '../../types';
+import CourseCard from '../elements/CourseCard';
+import { AcademicData, Course } from '../../types';
 
 interface DashboardProps {
-  data: SkywardData;
+  data: AcademicData;
 }
 
 export default function DashboardView({ data }: DashboardProps) {
@@ -15,10 +15,12 @@ export default function DashboardView({ data }: DashboardProps) {
   //destructure wrapper (weird syntax imo)
   const { courses, availableTerms, currentTerm } = data;
   const [selectedTerm, setSelectedTerm] = useState(currentTerm);
+  const theme = useTheme();
+  const styles = createStyles(theme);
 
   const filteredCourses = courses.filter(course => {
     //course.grades is a set, so if we have term data for this term
-    //and we have both a letter and a numeric value for that grade, we "have data" for that course.
+    //and we have a letter or numeric value for that grade, we "have data" for that course.
     const termData = course.grades[selectedTerm];
     const hasData = termData && (termData.numeric !== undefined || termData.letter !== undefined);
     
@@ -69,6 +71,7 @@ export default function DashboardView({ data }: DashboardProps) {
               grade={termGrade?.numeric} 
               letterGrade={termGrade?.letter}
               period={item.period?.toString()}
+              teacher={item.teacher}
             />
           );
         }}
@@ -77,20 +80,20 @@ export default function DashboardView({ data }: DashboardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Theme.colors.background,
+    backgroundColor: theme.colors.background,
   },
   tabContainer: {
     //continuous thin line across the screen
     borderBottomWidth: 1,
-    borderBottomColor: Theme.colors.textSecondary, 
+    borderBottomColor: theme.colors.textSecondary, 
     marginTop: 10,
     marginBottom: 15,
   },
   tabScroll: {
-    paddingHorizontal: cardPadding,
+    paddingHorizontal: 16,
     flexDirection: 'row',
   },
   tabButton: {
@@ -105,22 +108,22 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabButtonActive: {
-    borderBottomColor: Theme.colors.textPrimary,
+    borderBottomColor: theme.colors.textPrimary,
   },
   tabText: {
     fontSize: 15,
-    fontFamily: Theme.fonts.heading,
+    fontFamily: theme.fonts.heading,
     //by default light gray
-    color: Theme.colors.textSecondary,
+    color: theme.colors.textSecondary,
     letterSpacing: 0.5,
   },
   tabTextActive: {
     //white
-    color: Theme.colors.textPrimary,
+    color: theme.colors.textPrimary,
   },
   tabTextUnavailable: {
     //darker gray
-    color: Theme.colors.textUnavailable, 
+    color: theme.colors.textUnavailable, 
   },
 
   scrollContainer: {

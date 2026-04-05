@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+import { StyleSheet } from 'react-native';
 import { AppSettings } from '../config/settings';
 
 const standardGradeColors = {
@@ -17,11 +19,12 @@ const colorblindGradeColors = {
   gradeRed: '#CC79A7',    //E - Pinkish
 };
 
-export const getTheme = () => {
+export const useTheme = () => {
   const isAccessible = AppSettings.accessibleFonts;
   const isColorblind = AppSettings.colorblindMode;
 
-  return { 
+  //generate raw theme object
+  const theme = useMemo(() => ({
     colors: {
       //Backgrounds
       background: '#121212',
@@ -43,12 +46,13 @@ export const getTheme = () => {
     },
 
     fonts: {
-      title: 'PlusJakartaSans_800ExtraBold',
+      //really just a test of the accessibility settings, change to diff fonts later.
+      title: isAccessible ? 'PlusJakartaSans_700Bold' : 'PlusJakartaSans_800ExtraBold',
       heading: 'PlusJakartaSans_700Bold',
       body: 'PlusJakartaSans_400Regular',
-      gradeDisplay: 'Inter_900ExtraBold',
+      gradeDisplay: 'Inter_800ExtraBold', 
     }
-  }
-};
+  }), [isAccessible, isColorblind]);
 
-export const Theme = getTheme();
+  return theme;
+};

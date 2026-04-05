@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import LoginView from './src/components/screens/LoginView';
-import DashboardView from './src/components/screens/DashboardView'; 
-import { Theme } from './src/styles/theme';
-import { SkywardData } from './src/types';
 import { 
   useFonts, 
   PlusJakartaSans_400Regular, 
@@ -14,11 +10,18 @@ import {
 import { 
   Inter_600SemiBold, 
   Inter_800ExtraBold 
-} from '@expo-google-fonts/inter'; //for the grade letter
+} from '@expo-google-fonts/inter';
+
+import { PlatformId } from './src/components/screens/PlatformSelectView';
+import { AcademicData } from './src/types';
+
+import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [skywardData, setSkywardData] = useState<SkywardData | null>(null);
+  const [academicData, setAcademicData] = useState<AcademicData | null>(null);
+  const [activePlatform, setActivePlatform] = useState<PlatformId | null>(null);
+
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_600SemiBold,
@@ -28,23 +31,24 @@ export default function App() {
     Inter_800ExtraBold
   });
 
-  // If fonts aren't loaded, keep the splash screen up or return null
   if (!fontsLoaded) {
     return null; 
   }
 
-  const handleLoginSuccess = (fetchedData: SkywardData) => {
-    setSkywardData(fetchedData); //save data
+  const handleLoginSuccess = (fetchedData: AcademicData) => {
+    setAcademicData(fetchedData); //save data
     setIsLoggedIn(true); //swap screens
   };
 
   return (
     <SafeAreaProvider>
-      {isLoggedIn && skywardData ? (
-        <DashboardView data={skywardData} />
-      ) : (
-        <LoginView onLoginSuccess={handleLoginSuccess} />
-      )}
+      <AppNavigator 
+        isLoggedIn={isLoggedIn}
+        academicData={academicData}
+        activePlatform={activePlatform}
+        setActivePlatform={setActivePlatform}
+        handleLoginSuccess={handleLoginSuccess}
+      />
     </SafeAreaProvider>
   );
 }
