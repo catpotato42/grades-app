@@ -9,6 +9,7 @@ const standardGradeColors = {
   gradeYellow: '#FFCC00', //C
   gradeOrange: '#FF9500', //D
   gradeRed: '#FF3B30', //E
+  gradeGrey: '#606060'
 }
 
 const colorblindGradeColors = {
@@ -17,6 +18,7 @@ const colorblindGradeColors = {
   gradeYellow: '#FFCC00',  //C
   gradeOrange: '#D55E00',  //D - Orange-Red
   gradeRed: '#CC79A7',    //E - Pinkish
+  gradeGrey: '#606060'
 };
 
 export const useTheme = () => {
@@ -34,6 +36,8 @@ export const useTheme = () => {
       textPrimary: '#FFFFFF',
       textSecondary: '#A0A0A0',
       textUnavailable: '#5A5A5A',
+      //should not be swapped if I add light mode
+      textGrades: '#121212',
       
       //Grade Indicators
       ...(isColorblind ? colorblindGradeColors : standardGradeColors),

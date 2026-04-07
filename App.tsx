@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import PlatformSelectView, { PlatformId } from './src/components/screens/PlatformSelectView';
+import SkywardLoginView from './src/components/screens/SkywardLoginView';
+
+import MainScreen from './src/components/screens/MainScreen';
+import { AcademicData } from './src/types';
+
 import { 
   useFonts, 
   PlusJakartaSans_400Regular, 
@@ -11,11 +18,6 @@ import {
   Inter_600SemiBold, 
   Inter_800ExtraBold 
 } from '@expo-google-fonts/inter';
-
-import { PlatformId } from './src/components/screens/PlatformSelectView';
-import { AcademicData } from './src/types';
-
-import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -40,15 +42,25 @@ export default function App() {
     setIsLoggedIn(true); //swap screens
   };
 
+  //helper
+  const renderContent = () => {
+    //if logged in, show main screen
+    if (isLoggedIn && academicData) {
+      return <MainScreen data={academicData} />;
+    }
+
+    //if platform selected, show the selected platform
+    if (activePlatform === 'skyward') {
+      return <SkywardLoginView onLoginSuccess={handleLoginSuccess} />;
+    }
+
+    //default: select platform
+    return <PlatformSelectView onSelectPlatform={setActivePlatform} />;
+  };
+
   return (
     <SafeAreaProvider>
-      <AppNavigator 
-        isLoggedIn={isLoggedIn}
-        academicData={academicData}
-        activePlatform={activePlatform}
-        setActivePlatform={setActivePlatform}
-        handleLoginSuccess={handleLoginSuccess}
-      />
+      {renderContent()}
     </SafeAreaProvider>
   );
 }

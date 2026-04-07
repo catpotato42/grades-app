@@ -1,41 +1,50 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../styles/theme';
+import { BottomTabBar, BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
 
 export const CARD_PADDING = 16;
 
 interface BaseCourseCardProps {
   title: string;
-  gradeDisplay: string; // The "Letter" or central focus
+  gradeDisplay: string; //letter not percent
+  offset: number;
   backgroundColor: string;
-  style: { width: number; height: number; [key: string]: any }; // Force size requirement
-  children?: React.ReactNode; // For the "everything else is free" part
+  style: { width: number; height: number; [key: string]: any }; //size must be specified
+  topContent?: React.ReactNode;
+  bottomContent?: React.ReactNode;
 }
 
 export default function BaseCourseCard({ 
   title, 
-  gradeDisplay, 
+  gradeDisplay,
+  offset = 10,
   backgroundColor, 
   style, 
-  children 
+  topContent,
+  bottomContent 
 }: BaseCourseCardProps) {
   const theme = useTheme();
   const s = createStyles(theme);
 
   return (
     <View style={[s.cardBase, { backgroundColor }, style]}>
+
+      <View style={[s.centerContainer, {marginTop: offset}]}>
+        <Text style={s.letterGradeText}>{gradeDisplay}</Text>
+      </View>
+
       {/* top left */}
       <View>
         <Text style={s.courseTitle} numberOfLines={1}>
           {title.toUpperCase() || "—"}
         </Text>
         {/* other things go here */}
-        {children}
+        {topContent}
       </View>
 
-      {/* center grade */}
-      <View style={s.centerContainer}>
-        <Text style={s.letterGradeText}>{gradeDisplay}</Text>
+      <View style={s.bottomContainer}>
+        {bottomContent}
       </View>
     </View>
   );
@@ -46,22 +55,26 @@ const createStyles = (theme: any) => StyleSheet.create({
     borderRadius: 22,
     padding: CARD_PADDING,
     justifyContent: 'space-between',
+    position: 'relative',
   },
   courseTitle: {
-    color: theme.colors.background,
+    color: theme.colors.textGrades,
     fontSize: 14,
     fontFamily: theme.fonts.title,
     letterSpacing: 0.5,
   },
   centerContainer: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
   },
   letterGradeText: {
     fontSize: 55,
     fontFamily: theme.fonts.gradeDisplay,
-    color: theme.colors.background,
+    color: theme.colors.textGrades,
     letterSpacing: -2,
   },
+  bottomContainer: {
+    alignItems: 'center'
+  }
 });

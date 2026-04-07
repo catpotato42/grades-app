@@ -3,8 +3,9 @@ import { StyleSheet, FlatList, View, Text, TouchableOpacity, ScrollView } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../styles/theme';
 import { AppSettings } from '../../config/settings';
-import CourseCard from '../elements/CourseCard';
+import DashCourseCard from '../elements/DashCourseCard';
 import { AcademicData, Course } from '../../types';
+import ClassView from './ClassView';
 
 interface DashboardProps {
   data: AcademicData;
@@ -15,13 +16,14 @@ export default function DashboardView({ data }: DashboardProps) {
   //destructure wrapper (weird syntax imo)
   const { courses, availableTerms, currentTerm } = data;
   const [selectedTerm, setSelectedTerm] = useState(currentTerm);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const theme = useTheme();
   const styles = createStyles(theme);
 
   const filteredCourses = courses.filter(course => {
-    //course.grades is a set, so if we have term data for this term
+    //course.officialGrades is a set, so if we have term data for this term
     //and we have a letter or numeric value for that grade, we "have data" for that course.
-    const termData = course.grades[selectedTerm];
+    const termData = course.officialGrades[selectedTerm];
     const hasData = termData && (termData.numeric !== undefined || termData.letter !== undefined);
     
     if (!hasData && !AppSettings.showClassesWithNoData) return false;
@@ -30,52 +32,67 @@ export default function DashboardView({ data }: DashboardProps) {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <View style={styles.tabContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabScroll}>
-          {availableTerms.map((term) => {
-            const isSelected = selectedTerm === term;
-            const isAvailable = courses.some(c => c.grades[term]);
+      <View style={{ flex: 1, display: selectedCourse ? 'none' : 'flex' }}>
+        <View style={styles.tabContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabScroll}>
+            {availableTerms.map((term) => {
+              const isSelected = selectedTerm === term;
+              const isAvailable = courses.some(c => c.officialGrades[term]);
+
+              return (
+                <TouchableOpacity
+                  key={term}
+                  style={[styles.tabButton, isSelected ? styles.tabButtonActive : styles.tabButtonInactive]}
+                  onPress={() => isAvailable && setSelectedTerm(term)}
+                  disabled={!isAvailable}
+                >
+                  <Text style={[
+                    styles.tabText,
+                    isSelected && styles.tabTextActive,
+                    !isAvailable && styles.tabTextUnavailable
+                  ]}>
+                    {term}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        <FlatList
+          data={filteredCourses}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          contentContainerStyle={styles.scrollContainer}
+          columnWrapperStyle={styles.columnWrapper}
+          renderItem={({ item }) => {
+            //use official grade, offset is only calculated inside ClassView
+            const termGrade = item.officialGrades?.[selectedTerm]; 
 
             return (
-              <TouchableOpacity
-                key={term}
-                style={[styles.tabButton, isSelected ? styles.tabButtonActive : styles.tabButtonInactive]}
-                onPress={() => isAvailable && setSelectedTerm(term)}
-                disabled={!isAvailable}
-              >
-                <Text style={[
-                  styles.tabText,
-                  isSelected && styles.tabTextActive,
-                  !isAvailable && styles.tabTextUnavailable
-                ]}>
-                  {term}
-                </Text>
-              </TouchableOpacity>
+              <DashCourseCard 
+                courseName={item.title}
+                grade={termGrade?.numeric} 
+                letterGrade={termGrade?.letter}
+                period={item.period?.toString()}
+                teacher={item.teacher}
+                onPress={() => setSelectedCourse(item)}
+              />
             );
-          })}
-        </ScrollView>
+          }}
+        />
       </View>
 
-      <FlatList
-        data={filteredCourses}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        contentContainerStyle={styles.scrollContainer}
-        columnWrapperStyle={styles.columnWrapper}
-        renderItem={({ item }) => {
-          const termGrade = item.grades?.[selectedTerm]; 
+      {selectedCourse && (
+        <View style={StyleSheet.absoluteFill}>
+          <ClassView 
+            course={selectedCourse} 
+            selectedTerm={selectedTerm}
+            onBack={() => setSelectedCourse(null)} 
+          />
+        </View>
+      )}
 
-          return (
-            <CourseCard 
-              courseName={item.title} 
-              grade={termGrade?.numeric} 
-              letterGrade={termGrade?.letter}
-              period={item.period?.toString()}
-              teacher={item.teacher}
-            />
-          );
-        }}
-      />
     </SafeAreaView>
   );
 }

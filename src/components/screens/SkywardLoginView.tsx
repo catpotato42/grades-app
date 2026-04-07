@@ -22,7 +22,7 @@ export default function SkywardLoginView({ onLoginSuccess }: SkywardLoginProps) 
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async () => {
-    if (!district || !username || !password) {
+    if (!username || !password) {
       setError("Please fill in all fields.");
       return;
     }
@@ -62,7 +62,7 @@ export default function SkywardLoginView({ onLoginSuccess }: SkywardLoginProps) 
       />
       <TextInput
         style={s.input}
-        placeholder="District Name"
+        placeholder="District"
         placeholderTextColor={theme.colors.textSecondary}
         value={district}
         onChangeText={setDistrict}

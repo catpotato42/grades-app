@@ -47,7 +47,7 @@ export default function BaseLoginView({
             
             {error && <Text style={s.errorText}>{error}</Text>}
 
-            {/* Injected extra fields (e.g., District) go here */}
+            {/* extra fields like state and district */}
             {children}
 
             <TextInput
