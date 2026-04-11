@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import { StyleSheet, FlatList, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../styles/theme';
@@ -14,11 +14,13 @@ interface DashboardProps {
 export default function DashboardView({ data }: DashboardProps) {
   if (!data) return null;
   //destructure wrapper (weird syntax imo)
-  const { courses, availableTerms, currentTerm } = data;
-  const [selectedTerm, setSelectedTerm] = useState(currentTerm);
+  const { courses, terms, currentTerm } = data;
+  const initialTermId = typeof currentTerm === 'string' ? currentTerm : (currentTerm as any).id;
+  const [selectedTerm, setSelectedTerm] = useState(initialTermId);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const theme = useTheme();
   const styles = createStyles(theme);
+  const settings = useSyncExternalStore(AppSettings.subscribe, AppSettings.getSnapshot);
 
   const filteredCourses = courses.filter(course => {
     //course.officialGrades is a set, so if we have term data for this term
@@ -26,7 +28,7 @@ export default function DashboardView({ data }: DashboardProps) {
     const termData = course.officialGrades[selectedTerm];
     const hasData = termData && (termData.numeric !== undefined || termData.letter !== undefined);
     
-    if (!hasData && !AppSettings.showClassesWithNoData) return false;
+    if (!hasData && !settings.colorblindMode) return false;
     return true;
   });
 
@@ -35,15 +37,15 @@ export default function DashboardView({ data }: DashboardProps) {
       <View style={{ flex: 1, display: selectedCourse ? 'none' : 'flex' }}>
         <View style={styles.tabContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabScroll}>
-            {availableTerms.map((term) => {
-              const isSelected = selectedTerm === term;
-              const isAvailable = courses.some(c => c.officialGrades[term]);
+            {terms.map((termDef) => {
+              const isSelected = selectedTerm === termDef.id;
+              const isAvailable = courses.some(c => c.officialGrades[termDef.id]);
 
               return (
                 <TouchableOpacity
-                  key={term}
+                  key={termDef.id}
                   style={[styles.tabButton, isSelected ? styles.tabButtonActive : styles.tabButtonInactive]}
-                  onPress={() => isAvailable && setSelectedTerm(term)}
+                  onPress={() => isAvailable && setSelectedTerm(termDef.id)}
                   disabled={!isAvailable}
                 >
                   <Text style={[
@@ -51,7 +53,7 @@ export default function DashboardView({ data }: DashboardProps) {
                     isSelected && styles.tabTextActive,
                     !isAvailable && styles.tabTextUnavailable
                   ]}>
-                    {term}
+                    {termDef.title}
                   </Text>
                 </TouchableOpacity>
               );
@@ -72,7 +74,7 @@ export default function DashboardView({ data }: DashboardProps) {
             return (
               <DashCourseCard 
                 courseName={item.title}
-                grade={termGrade?.numeric} 
+                grade={termGrade?.numeric}
                 letterGrade={termGrade?.letter}
                 period={item.period?.toString()}
                 teacher={item.teacher}
@@ -88,6 +90,7 @@ export default function DashboardView({ data }: DashboardProps) {
           <ClassView 
             course={selectedCourse} 
             selectedTerm={selectedTerm}
+            terms={terms}
             onBack={() => setSelectedCourse(null)} 
           />
         </View>

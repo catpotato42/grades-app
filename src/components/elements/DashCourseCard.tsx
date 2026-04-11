@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Dimensions, Pressable } from 'react-native';
 import { useTheme } from '../../styles/theme';
-import { useGradeColor } from '../../utils/gradeUtils';
+import { useGradeColor, getLetterGrade } from '../../utils/gradeUtils';
 import BaseCourseCard from './BaseCourseCard';
 
 const { width } = Dimensions.get('window');
@@ -27,7 +27,7 @@ export default function DashCourseCard({courseName, grade, letterGrade, period, 
     <Pressable onPress={onPress}>
       <BaseCourseCard
         title={courseName || "—"}
-        gradeDisplay={letterGrade || "—"}
+        gradeDisplay={letterGrade || getLetterGrade(grade)}
         offset={15}
         backgroundColor={backgroundColor}
         style={{ width: size, height: size }}

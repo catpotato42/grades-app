@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Dimensions, Pressable, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Course, Assignment } from '../../types';
+import { Course, Assignment, Term } from '../../types';
 import { useTheme } from '../../styles/theme';
 import ClassCourseCard from '../elements/ClassCourseCard';
 import DashCourseCard from '../elements/DashCourseCard';
@@ -16,14 +16,18 @@ const DUAL_VIEW_CARD_SIZE = width / 2;
 interface ClassViewProps {
   course: Course;
   selectedTerm: string;
+  terms: Term[];
   onBack: () => void;
 }
 
-export default function ClassView({ course, selectedTerm, onBack }: ClassViewProps) {
+export default function ClassView({ course, selectedTerm, terms, onBack }: ClassViewProps) {
   const theme = useTheme();
   //copy of Course data so we can edit in real time
   const [baseCourse, setBaseCourse] = useState<Course>(course); //baseline INCLUDING OFFSET
   const [localCourse, setLocalCourse] = useState<Course>(course); //mutable version
+  const currentTermDef = terms.find((t: any) => (typeof t === 'string' ? t : t.id) === selectedTerm) as any;
+  const activeTermIds = currentTermDef?.subTermIds || [selectedTerm];
+  const isRelevantAssignment = (a: Assignment) => !a.termId || activeTermIds.includes(a.termId);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const styles = createStyles(theme);
   const [hasDiscrepancy, setHasDiscrepancy] = useState(false);
@@ -33,12 +37,13 @@ export default function ClassView({ course, selectedTerm, onBack }: ClassViewPro
   //logic to calculate discrepancy between calculated grade and official grade
   useEffect(() => {
     const official = course.officialGrades[selectedTerm]?.numeric;
-    const initialCalc = calculateCourseGrade(course.assignments, course.categoryWeights);
+    const termSpecificAssignments = course.assignments.filter(isRelevantAssignment);
+    const initialCalc = calculateCourseGrade(termSpecificAssignments, course.categoryWeights);
     const currentDisplayGrade = initialCalc !== null ? Math.round(initialCalc) : null;
     
     if (official !== undefined && currentDisplayGrade != official) {
       setHasDiscrepancy(true);
-      const validAssigns = course.assignments.filter(a => a.score !== undefined && a.totalPoints !== undefined);
+      const validAssigns = termSpecificAssignments.filter(a => a.score !== undefined && a.totalPoints !== undefined);
       let targetScore = 0;
       let targetCategory = 'Calibration';
       let targetTotalPoints = 0;
@@ -67,8 +72,13 @@ export default function ClassView({ course, selectedTerm, onBack }: ClassViewPro
       }
 
       const offsetAssignment: Assignment = {
-        id: 'sys-offset', title: 'Offset Assignment', category: targetCategory,
-        score: parseFloat(targetScore.toFixed(2)), totalPoints: targetTotalPoints, isMock: true
+        id: 'sys-offset', 
+        title: 'Offset Assignment', 
+        termId: activeTermIds[activeTermIds.length - 1], //if an aggregator term uses last subterm
+        category: targetCategory,
+        score: parseFloat(targetScore.toFixed(2)), 
+        totalPoints: targetTotalPoints, 
+        isMock: true
       };
 
       setLocalCourse(prev => ({ ...prev, assignments: [...prev.assignments, offsetAssignment] }));
@@ -103,13 +113,14 @@ export default function ClassView({ course, selectedTerm, onBack }: ClassViewPro
       category: localCourse.categoryWeights?.[0]?.name || 'Uncategorized',
       score: 100,
       totalPoints: 100,
-      isMock: true
+      isMock: true,
+      termId: activeTermIds[activeTermIds.length - 1]
     };
     //next assignments go at the bottom
     setLocalCourse(prev => ({ ...prev, assignments: [...prev.assignments, newAssign] }));
   };
 
-  //text input. It would be great if someone refactored this file into more files... oh...
+  //text input.
   const updateAssignmentField = (field: 'score' | 'totalPoints', newVal?: number) => {
     setIsEdited(true);
     setLocalCourse(prev => ({
@@ -121,32 +132,10 @@ export default function ClassView({ course, selectedTerm, onBack }: ClassViewPro
     setSelectedAssignment(prev => prev ? { ...prev, [field]: newVal } : prev);
   };
 
-  //typing
-  const handleTextChange = (text: string) => {
-    if (text === '') {
-      updateAssignmentField('score', 0);
-      return;
-    }
-    const num = parseFloat(text);
-    if (!isNaN(num)) updateAssignmentField('score', num);
-  };
-
-  // NEW: Re-uses the generic function for typing the Max Points
-  const handleMaxPointsChange = (text: string) => {
-    if (text === '') {
-      updateAssignmentField('totalPoints', undefined);
-      return;
-    }
-    const num = parseFloat(text);
-    if (!isNaN(num)) updateAssignmentField('totalPoints', num);
-  };
-
-  const handleSliderChange = (val: number) => {
-    updateAssignmentField('score', Math.round(val * 10) / 10);
-  };
-
+  const displayAssignments = localCourse.assignments.filter(isRelevantAssignment);
   //live rendering, edits show up immediately
-  const liveGradeCalc = calculateCourseGrade(localCourse.assignments, localCourse.categoryWeights, ignoredIds);
+  const liveGradeCalc = calculateCourseGrade(displayAssignments, localCourse.categoryWeights, ignoredIds);
+
   const renderCourse: Course = {
     ...localCourse,
     officialGrades: {
@@ -161,14 +150,22 @@ export default function ClassView({ course, selectedTerm, onBack }: ClassViewPro
   return (
     <View style={styles.container}>
       <View style={{ flex: 1, display: selectedAssignment ? 'none' : 'flex' }}>
-        <Pressable onPress={onBack} style={styles.backButton}>
+        <Pressable 
+          onPress={onBack} 
+          style={styles.backButton}
+        >
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
 
-        <View style={[styles.backButton, {top: 80, left: 0}]}>
-            {hasDiscrepancy && (
-                <Text style={styles.alertText}> Calculated grade based on assignments differs from official, so offset assignment was created to resolve discrepancy. Report this bug 
-                with a screenshot and your grade platform (e.g. Skyward, Powerschool, etc.) at simon.a.harrington@gmail.com</Text>
+        <View 
+          style={styles.titleContainer}
+          pointerEvents="box-none"
+        >
+            {hasDiscrepancy ? (
+              <Text style={styles.alertText}> Calculated grade based on assignments differs from official, so offset assignment was created to resolve discrepancy. Report this bug 
+              with a screenshot and your grade platform (e.g. Skyward, Powerschool, etc.) at simon.a.harrington@gmail.com</Text>
+            ) : (
+              <Text style={styles.titleText}>Assignment View</Text>
             )}
         </View>
 
@@ -201,103 +198,44 @@ export default function ClassView({ course, selectedTerm, onBack }: ClassViewPro
           )}
         </View>
 
-        <ScrollView 
-          style={styles.assignmentsContainer}
-          contentContainerStyle={styles.assignmentsScroll}
-          showsVerticalScrollIndicator={false}
-        >
-          {localCourse.assignments?.map((assignment) => {
-            const earned = assignment.score;
-            const possible = assignment.totalPoints;
+        <ScrollView style={styles.assignmentsContainer} contentContainerStyle={styles.assignmentsScroll} showsVerticalScrollIndicator={false}>
+          {displayAssignments.map((assignment) => {
             const isIgnored = ignoredIds.has(assignment.id);
+            const percentage = (assignment.score !== undefined && assignment.totalPoints !== undefined && assignment.totalPoints > 0) 
+              ? Math.round((assignment.score / assignment.totalPoints) * 100) : null;
             
-            const percentage = (earned !== undefined && possible !== undefined && possible > 0) 
-              ? Math.round((earned / possible) * 100) 
-              : null;
-
-            const barColor = isIgnored ? theme.colors.gradeGrey : getThemeGradeColor(percentage);
+            const isOffset = assignment.id === 'sys-offset';
+            const barColor = (isIgnored || isOffset) ? theme.colors.gradeGrey : getThemeGradeColor(percentage);
+            const origAssign = baseCourse.assignments.find(a => a.id === assignment.id);
 
             return (
-              <View key={assignment.id} style={styles.assignmentRow}>
-
-                {/* Toggle Ignore */}
-                <TouchableOpacity onPress={() => toggleIgnore(assignment.id)} style={styles.checkBox}>
-                  {!isIgnored && <Text style={styles.checkText}>✓</Text>}
-                </TouchableOpacity>
-
-                {/* Assignment Bar */}
-                <TouchableOpacity 
-                  //if it's ignored turns it a slightly darker grey to differentiate
-                  style={[styles.assignmentBar, { backgroundColor: barColor, opacity: isIgnored ? 0.6 : 1 }]}
-                  onPress={() => setSelectedAssignment(assignment)}
-                >
-                  <Text style={[styles.assignmentTitle]} numberOfLines={1}>
-                    {assignment.title}
-                  </Text>
-                  <Text style={[styles.assignmentScore]}>
-                    {percentage !== null ? `${percentage}%` : '-%'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <AssignmentItem 
+                key={assignment.id}
+                assignment={assignment}
+                originalAssignment={origAssign}
+                isIgnored={isIgnored}
+                barColor={barColor}
+                theme={theme}
+                onToggleIgnore={toggleIgnore}
+                onSelect={setSelectedAssignment}
+              />
             );
           })}
-
+          
           <TouchableOpacity style={styles.addButton} onPress={handleAddAssignment}>
              <Text style={styles.addButtonText}>+ Add Assignment</Text>
           </TouchableOpacity>
-
         </ScrollView>
       </View>
 
       {selectedAssignment && (
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.colors.background }]}>
-          <Pressable onPress={() => setSelectedAssignment(null)} style={styles.backButton}>
-            <Text style={styles.backText}>← Back to {course.title}</Text>
-          </Pressable>
-          
-          <View style={styles.editorContent}>
-             <Text style={styles.editorTitle} numberOfLines={2}>
-               {selectedAssignment.title}
-             </Text>
-             
-             {/* Slider & Inputs */}
-             <View style={styles.editRow}>
-                <Slider
-                  style={styles.slider}
-                  minimumValue={0}
-                  //max is either max points or where input is currently set.
-                  maximumValue={Math.max(selectedAssignment.totalPoints || 100, selectedAssignment.score || 0, 1)}
-                  value={selectedAssignment.score ?? 0}
-                  onSlidingComplete={handleSliderChange}
-                  minimumTrackTintColor={theme.colors.textPrimary}
-                  maximumTrackTintColor={theme.colors.surface}
-                  thumbTintColor={theme.colors.textPrimary}
-                />
-
-                <View style={styles.inputContainer}>
-                  <TextInput 
-                    style={styles.inputText}
-                    keyboardType="numeric"
-                    value={selectedAssignment.score !== undefined ? String(selectedAssignment.score) : ""}
-                    onChangeText={handleTextChange}
-                    placeholder="0"
-                    placeholderTextColor={theme.colors.textSecondary}
-                  />
-                  
-                  <Text style={styles.slashText}>/</Text>
-                  
-                  <TextInput 
-                    style={[styles.inputText, { color: theme.colors.textSecondary }]}
-                    keyboardType="numeric"
-                    value={selectedAssignment.totalPoints !== undefined ? String(selectedAssignment.totalPoints) : ""}
-                    onChangeText={handleMaxPointsChange}
-                    placeholder="0"
-                    placeholderTextColor={theme.colors.textSecondary}
-                  />
-                </View>
-             </View>
-          </View>
-        </View>
+        <AssignmentEditor 
+          assignment={selectedAssignment}
+          originalAssignment={baseCourse.assignments.find(a => a.id === selectedAssignment.id)}
+          theme={theme}
+          onBack={() => setSelectedAssignment(null)}
+          onUpdateField={updateAssignmentField}
+        />
       )}
     </View>
   );
@@ -312,7 +250,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     position: 'absolute',
     top: 60,
     left: 17,
-    padding: 10,
+    padding: 20,
     zIndex: 10,
   },
   backText: {
@@ -331,8 +269,10 @@ const createStyles = (theme: any) => StyleSheet.create({
   alertText: { 
     color: theme.colors.gradeRed, 
     fontSize: 12, 
-    marginTop: 8, 
+    marginTop: -10,
+    marginLeft: 5,
     fontFamily: theme.fonts.heading,
+    zIndex: 0,
   },
   assignmentsContainer: {
     position: 'absolute',
@@ -350,36 +290,13 @@ const createStyles = (theme: any) => StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  checkBox: {
-    width: 24,
-    height: 24,
-    borderWidth: 2,
-    borderColor: theme.colors.textSecondary,
-    marginRight: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkText: {
-    color: theme.colors.textPrimary,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  assignmentBar: {
-    flex: 1, 
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 14,
-  },
   addButton: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
     borderRadius: 14,
     borderWidth: 2,
-    borderColor: theme.colors.surface,
+    borderColor: theme.colors.border,
     borderStyle: 'dashed',
     marginTop: 10,
   },
@@ -387,65 +304,6 @@ const createStyles = (theme: any) => StyleSheet.create({
     color: theme.colors.textPrimary,
     fontFamily: theme.fonts.heading,
     fontSize: 16,
-  },
-  assignmentTitle: {
-    color: theme.colors.textGrades,
-    fontFamily: theme.fonts.heading,
-    fontSize: 15,
-    flex: 1,
-    paddingRight: 10,
-  },
-  assignmentScore: {
-    color: theme.colors.textGrades,
-    fontFamily: theme.fonts.heading,
-    fontSize: 16,
-  },
-  editorContent: { 
-    flex: 1, 
-    alignItems: 'center', 
-    justifyContent: 'center' 
-  },
-  editorTitle: { 
-    color: theme.colors.textPrimary, 
-    fontSize: 20, 
-    fontFamily: theme.fonts.heading 
-  },
-  editorSub: { 
-    color: theme.colors.textSecondary, 
-    marginTop: 10 
-  },
-  editRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-  },
-  slider: {
-    flex: 1,
-    height: 40,
-    marginRight: 20,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-  inputText: {
-    color: theme.colors.textPrimary,
-    fontSize: 24,
-    fontFamily: theme.fonts.heading,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.textSecondary,
-    minWidth: 45,
-    textAlign: 'center',
-    paddingBottom: 2,
-  },
-  slashText: {
-    color: theme.colors.textSecondary,
-    fontSize: 24,
-    fontFamily: theme.fonts.heading,
-    marginHorizontal: 8,
-    paddingBottom: 2,
   },
   dualCardRow: {
     flexDirection: 'row',
@@ -462,5 +320,17 @@ const createStyles = (theme: any) => StyleSheet.create({
     color: theme.colors.textSecondary,
     fontFamily: theme.fonts.heading,
     marginHorizontal: 5,
+  },
+  titleText: {
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fonts.title,
+    fontSize: 21,
+  },
+  titleContainer: {
+    top: '17%',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 1,
   },
 });

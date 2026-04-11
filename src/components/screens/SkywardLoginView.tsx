@@ -59,6 +59,7 @@ export default function SkywardLoginView({ onLoginSuccess }: SkywardLoginProps) 
         onChangeText={setState}
         autoCapitalize="words"
         autoCorrect={false}
+        keyboardAppearance={theme.dark ? 'dark' : 'light'}
       />
       <TextInput
         style={s.input}
@@ -68,6 +69,7 @@ export default function SkywardLoginView({ onLoginSuccess }: SkywardLoginProps) 
         onChangeText={setDistrict}
         autoCapitalize="words"
         autoCorrect={false}
+        keyboardAppearance={theme.dark ? 'dark' : 'light'}
       />
     </BaseLoginView>
   );

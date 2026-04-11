@@ -33,8 +33,8 @@ export default function ClassCourseCard({ course, selectedTerm, size=CARD_SIZE }
       offset={18}
       topContent={
         <>
+          <Text style={styles.subText}>{course.teacher ?? "—"}</Text>
           <Text style={styles.subText}>{course.period ? `Period ${course.period}` : "—"}</Text>
-          <Text style={styles.subText}>{course.teacher ? course.teacher.substring(course.teacher.indexOf(' ') + 1) : "—"}</Text>
         </>
       }
       bottomContent={

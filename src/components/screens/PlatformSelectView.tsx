@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../styles/theme';
+import { AppSettings } from '../../config/settings';
 
 export type PlatformId = 'skyward' | 'canvas' | 'powerschool';
 
@@ -12,6 +13,13 @@ interface PlatformSelectProps {
 export default function PlatformSelectView({ onSelectPlatform }: PlatformSelectProps) {
   const theme = useTheme();
   const s = createStyles(theme);
+  const [isReady, setIsReady] = useState(false);
+  
+  React.useEffect(() => {
+    AppSettings.load().then(() => setIsReady(true));
+  }, []);
+
+  if (!isReady) return null;
 
   const platforms = [
     { id: 'skyward' as PlatformId, name: 'Skyward', available: true },

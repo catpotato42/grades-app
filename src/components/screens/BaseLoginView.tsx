@@ -58,6 +58,7 @@ export default function BaseLoginView({
               onChangeText={onUsernameChange}
               autoCapitalize="none"
               autoCorrect={false}
+              keyboardAppearance={theme.dark ? 'dark' : 'light'}
             />
 
             <TextInput
@@ -67,6 +68,7 @@ export default function BaseLoginView({
               value={passwordValue}
               onChangeText={onPasswordChange}
               secureTextEntry={true}
+              keyboardAppearance={theme.dark ? 'dark' : 'light'}
             />
 
             <TouchableOpacity 
@@ -89,28 +91,52 @@ export default function BaseLoginView({
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background },
-  flex: { flex: 1 },
-  content: { flex: 1, justifyContent: 'center', paddingHorizontal: 40 },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background
+  },
+  flex: {
+    flex: 1
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 40
+  },
   title: {
-    fontSize: 28, fontFamily: theme.fonts.title, marginBottom: 40,
-    color: theme.colors.textPrimary, textAlign: 'center',
+    fontSize: 28,
+    fontFamily: theme.fonts.title,
+    marginBottom: 40,
+    color: theme.colors.textPrimary,
+    textAlign: 'center',
   },
   errorText: {
-    color: theme.colors.gradeRed, textAlign: 'center',
-    marginBottom: 15, fontFamily: theme.fonts.heading,
+    color: theme.colors.gradeRed,
+    textAlign: 'center',
+    marginBottom: 15,
+    fontFamily: theme.fonts.heading,
   },
   input: {
-    height: 50, borderBottomWidth: 1, borderBottomColor: theme.colors.border,
-    marginBottom: 25, fontSize: 16, fontFamily: theme.fonts.heading,
+    height: 50, borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    marginBottom: 25, fontSize: 16,
+    fontFamily: theme.fonts.heading,
     color: theme.colors.textPrimary,
   },
   button: {
-    backgroundColor: theme.colors.buttonPrimary, height: 52,
-    borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginTop: 20,
+    backgroundColor: theme.colors.buttonPrimary,
+    height: 52,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
   },
-  buttonDisabled: { opacity: 0.7 },
+  buttonDisabled: {
+    opacity: 0.7
+  },
   buttonText: {
-    color: theme.colors.background, fontSize: 16, fontFamily: theme.fonts.heading,
+    color: theme.colors.background,
+    fontSize: 16,
+    fontFamily: theme.fonts.heading,
   },
 });
