@@ -3,7 +3,7 @@ import { StyleSheet, FlatList, View, Text, TouchableOpacity, ScrollView } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../styles/theme';
 import { AppSettings } from '../../config/settings';
-import DashCourseCard from '../elements/DashCourseCard';
+import DashCourseCard from '../elements/CourseCards/DashCourseCard';
 import { AcademicData, Course } from '../../types';
 import ClassView from './ClassView';
 
@@ -21,14 +21,24 @@ export default function DashboardView({ data }: DashboardProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
   const settings = useSyncExternalStore(AppSettings.subscribe, AppSettings.getSnapshot);
+  const currentYearTermIds = terms.map(t => t.id);
 
   const filteredCourses = courses.filter(course => {
     //course.officialGrades is a set, so if we have term data for this term
     //and we have a letter or numeric value for that grade, we "have data" for that course.
+    const isCurrentYear = currentYearTermIds.some(id => course.officialGrades[id]);
+    if (!isCurrentYear) return false;
+
     const termData = course.officialGrades[selectedTerm];
-    const hasData = termData && (termData.numeric !== undefined || termData.letter !== undefined);
+    const hasDataForSelected = termData && (termData.numeric !== undefined || termData.letter !== undefined);
     
-    if (!hasData && !settings.colorblindMode) return false;
+    if (!hasDataForSelected && !settings.showClassesWithNoData) {
+      // Keep it if it had prior data in the current year (e.g., S1 course viewed in Q3)
+      const hasAnyPriorData = currentYearTermIds.some(id => 
+        course.officialGrades[id]?.numeric !== undefined || course.officialGrades[id]?.letter !== undefined
+      );
+      if (!hasAnyPriorData) return false;
+    }
     return true;
   });
 
@@ -68,20 +78,20 @@ export default function DashboardView({ data }: DashboardProps) {
           contentContainerStyle={styles.scrollContainer}
           columnWrapperStyle={styles.columnWrapper}
           renderItem={({ item }) => {
-            //use official grade, offset is only calculated inside ClassView
-            const termGrade = item.officialGrades?.[selectedTerm]; 
+        // Strictly fetch the grade for the currently selected tab. No fallbacks!
+        const termGrade = item.officialGrades?.[selectedTerm]; 
 
-            return (
-              <DashCourseCard 
-                courseName={item.title}
-                grade={termGrade?.numeric}
-                letterGrade={termGrade?.letter}
-                period={item.period?.toString()}
-                teacher={item.teacher}
-                onPress={() => setSelectedCourse(item)}
-              />
-            );
-          }}
+        return (
+          <DashCourseCard 
+            courseName={item.title}
+            grade={termGrade?.numeric}
+            letterGrade={termGrade?.letter}
+            period={item.period?.toString()}
+            teacher={item.teacher}
+            onPress={() => setSelectedCourse(item)}
+          />
+        );
+      }}
         />
       </View>
 

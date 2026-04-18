@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View, Dimensions, Pressable } from 'react-native';
-import { useTheme } from '../../styles/theme';
-import { useGradeColor, getLetterGrade } from '../../utils/gradeUtils';
+import { StyleSheet, Text, Dimensions, Pressable } from 'react-native';
+import { useTheme } from '../../../styles/theme';
+import { useGradeColor, getLetterGrade } from '../../../utils/gradeUtils';
 import BaseCourseCard from './BaseCourseCard';
 
 const { width } = Dimensions.get('window');
@@ -18,7 +18,6 @@ interface DashCourseCardProps {
 }
 
 export default function DashCourseCard({courseName, grade, letterGrade, period, teacher, onPress, size=CARD_SIZE}: DashCourseCardProps) {
-  //loads theme on every call of function so settings can update w/out restart
   const theme = useTheme();
   const backgroundColor = useGradeColor(grade);
   const styles = createStyles(theme);

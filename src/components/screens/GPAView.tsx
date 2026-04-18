@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../styles/theme';
-import { AcademicData, Course, PastCourse } from '../../types';
+import { AcademicData, Course } from '../../types';
 import { SmoothSwitch } from '../elements/CustomSwitch';
-import CourseItem from '../elements/CourseItem';
+import CourseItem from '../elements/ListItems/GPACourseItem';
 
 interface GPAViewProps {
   data: AcademicData;
@@ -12,29 +12,30 @@ interface GPAViewProps {
 
 type GPAType = 'Weighted' | 'Unweighted';
 
+const { width } = Dimensions.get('window');
+
 export default function GPAView({ data }: GPAViewProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
-
   const [gpaType, setGpaType] = useState<GPAType>('Weighted');
+
+  const currentYearTermIds = data.terms.map(t => t.id);
+  const currentCourses = data.courses.filter(c => currentYearTermIds.some(id => c.officialGrades[id]));
+  const pastCourses = data.courses.filter(c => !currentYearTermIds.some(id => c.officialGrades[id]));
 
   //track inclusion of each course by ID
   const [includedCourses, setIncludedCourses] = useState<Record<string, boolean>>(() => {
     const initialState: Record<string, boolean> = {};
     data.courses.forEach(c => initialState[c.id] = true);
-    data.pastCourses?.forEach(c => initialState[c.id] = true);
     return initialState;
   });
 
-  //true even if only one past course is included.
-  const isPastCoursesIncluded = data.pastCourses 
-    ? data.pastCourses.some(c => includedCourses[c.id]) 
-    : false;
+  const isPastCoursesIncluded = pastCourses.length > 0 && pastCourses.some(c => includedCourses[c.id]);
 
   const handleTogglePastCourses = (val: boolean) => {
     setIncludedCourses(prev => {
       const next = { ...prev };
-      data.pastCourses?.forEach(c => next[c.id] = val);
+      pastCourses.forEach(c => next[c.id] = val);
       return next;
     });
   };
@@ -45,7 +46,7 @@ export default function GPAView({ data }: GPAViewProps) {
 
   //numeric to letter if no letter given
   const convertNumericToLetter = (num?: number) => {
-    if (num === undefined) return 'F';
+    if (num === undefined) return 'N/A';
     if (num >= 93) return 'A';
     if (num >= 90) return 'A-';
     if (num >= 87) return 'B+';
@@ -59,7 +60,7 @@ export default function GPAView({ data }: GPAViewProps) {
     return 'F';
   };
 
-  // GPA Calculation Logic
+  //GPA Calculation Logic
   const calculatedGPA = useMemo(() => {
     let totalQualityPoints = 0;
     let totalCredits = 0;
@@ -90,21 +91,25 @@ export default function GPAView({ data }: GPAViewProps) {
       totalCredits += credits;
     };
 
-    //calculate gpa for all current courses
+    //calculate gpa for all courses
     data.courses.forEach(course => {
       if (!includedCourses[course.id]) return;
-      //get grade for current term, first term if missing (SUBOPTIMAL, TODO: IMPROVE)
-      const gradeObj = course.officialGrades[data.currentTerm] || Object.values(course.officialGrades)[0];
-      if (gradeObj && (gradeObj.letter || gradeObj.numeric)) {
-        calculatePoints(course.title, gradeObj.letter, gradeObj.numeric, 1.0); //assume 1 credit for current course
+      
+      const credits = course.credits ?? 1.0;
+      
+      // Use finalGrade first (past courses). If undefined, use current term grades.
+      let gradeObj = course.finalGrade;
+      
+      if (!gradeObj) {
+        gradeObj = course.officialGrades[data.currentTerm];
+        if (!gradeObj || (gradeObj.letter === undefined && gradeObj.numeric === undefined)) {
+          const grades = Object.values(course.officialGrades).filter(g => g.letter !== undefined || g.numeric !== undefined);
+          gradeObj = grades[grades.length - 1];
+        }
       }
-    });
 
-    //past course calcs
-    data.pastCourses?.forEach(course => {
-      if (!includedCourses[course.id]) return;
-      if (course.letter || course.numeric) {
-        calculatePoints(course.title, course.letter, course.numeric, course.credits);
+      if (gradeObj && (gradeObj.letter !== undefined || gradeObj.numeric !== undefined)) {
+        calculatePoints(course.title, gradeObj.letter, gradeObj.numeric, credits);
       }
     });
 
@@ -115,7 +120,7 @@ export default function GPAView({ data }: GPAViewProps) {
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       
       <View style={styles.tabContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabScroll}>
+        <View style={styles.tabScroll}>
           {(['Weighted', 'Unweighted'] as GPAType[]).map((tab) => (
             <TouchableOpacity
               key={tab}
@@ -127,7 +132,7 @@ export default function GPAView({ data }: GPAViewProps) {
               </Text>
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </View>
       </View>
 
       <View style={styles.gpaDisplayContainer}>
@@ -137,18 +142,18 @@ export default function GPAView({ data }: GPAViewProps) {
       <ScrollView style={styles.listContainer}>
         <Text style={styles.sectionHeader}>Current Courses</Text>
         <View style={styles.itemsWrapper}>
-          {data.courses.map((course) => (
+          {currentCourses.map((course) => (
             <CourseItem 
               key={course.id}
               course={course}
+              currentTerm={data.currentTerm}
               isIncluded={!!includedCourses[course.id]}
               onToggle={() => handleToggleCourse(course.id)}
-              theme={theme}
             />
           ))}
         </View>
 
-        {data.pastCourses && data.pastCourses.length > 0 && (
+        {pastCourses.length > 0 && (
           <>
             <View style={styles.pastCoursesHeader}>
               <Text style={styles.sectionHeader}>Past Courses</Text>
@@ -163,13 +168,12 @@ export default function GPAView({ data }: GPAViewProps) {
             </View>
             
             <View style={styles.itemsWrapper}>
-              {data.pastCourses.map((pastCourse) => (
-                <CourseItem 
+              {pastCourses.map((pastCourse) => (
+                <CourseItem
                   key={pastCourse.id}
-                  course={pastCourse} //CourseItem handles both pastcourse and current course types? TODO
+                  course={pastCourse}
                   isIncluded={!!includedCourses[pastCourse.id]}
                   onToggle={() => handleToggleCourse(pastCourse.id)}
-                  theme={theme}
                 />
               ))}
             </View>
@@ -194,6 +198,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   tabScroll: {
     paddingHorizontal: 16,
     flexDirection: 'row',
+    justifyContent: 'center',
   },
   tabButton: {
     paddingVertical: 12,

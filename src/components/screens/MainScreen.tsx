@@ -7,9 +7,9 @@ import { AppSettings} from '../../config/settings';
 import DashboardView from './DashboardView';
 import SettingsView from './SettingsView';
 import GPAView from './GPAView';
+import ArchiveView from './ArchiveView';
 //temp
 //const AttendanceView = () => <View style={{flex: 1}}><Text style={{color: 'white', padding: 20}}>Attendance</Text></View>;
-const ArchiveView = () => <View style={{flex: 1}}><Text style={{color: 'white', padding: 20}}>Archive</Text></View>;
 const LeaderboardView = () => <View style={{flex: 1}}><Text style={{color: 'white', padding: 20}}>Leaderboard</Text></View>;
 
 const TAB_ICONS: Record<TabId, any> = {
@@ -46,7 +46,7 @@ export default function MainScreen({ data }: MainScreenProps) {
       case 'dashboard': return <DashboardView data={data} />;
       //case 'attendance': return <AttendanceView />;
       case 'gpa': return <GPAView data={data} />;
-      case 'archive': return <ArchiveView />;
+      case 'archive': return <ArchiveView data={data}/>;
       case 'settings': return <SettingsView />;
       case 'leaderboard': return <LeaderboardView />;
       default: return <DashboardView data={data} />;

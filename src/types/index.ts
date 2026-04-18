@@ -4,11 +4,10 @@ export interface TermGrade {
 }
 
 export interface Term {
-  //unsure if we need both id and title, 
-  //but could prevent accidental duplication from the scraper from screwing too much up
   id: string;
   title: string;
   subTermIds?: string[]; //undefined for lowest-level terms like quarters
+  absences?: number;
 }
 
 export interface Assignment {
@@ -35,26 +34,23 @@ export interface Course {
   period?: number;
   room?: string;
   teacher?: string;
+  //this is used as 1.0: full year, .5: half-year for hs. College should just be 1.0 per semester. DO NOT scrape actual credit amounts, if provided a conversion is necessary.
+  credits?: number;
+  //should be a year like 2025-2026 or a semester/quarter like Fall 2026.
+  //this should not be shown to the student, so it's fine to get incorrect years,
+  //we just need to group the years correctly.
+  termTitle?: string;
+  finalGrade?: TermGrade;
   officialGrades: Record<string, TermGrade>;
   assignments: Assignment[];
+  absences?: number;
   categoryWeights?: CategoryWeight[]; //if null assume system is unweighted
-}
-
-export interface PastCourse {
-  id: string;
-  title: string;
-  credits: number; //use 0.5 as default for semester, 1 as default for year. 
-  numeric?: number; //give as equivalent numeric if given gpa for that class instead
-  letter?: string; //use N/A for null
-  teacher?: string;
-  termTitle?: string; //group by term
 }
 
 export interface AcademicData {
   currentTerm: string;     // e.g., "Q3"
   terms: Term[]; // e.g., ["Q1", "Q2", "S1", "Q3", "Q4", "S2", "FIN"]
   courses: Course[];
-  pastCourses?: PastCourse[];
   studentName?: string;
   gpa?: number;
 }

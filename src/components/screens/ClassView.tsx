@@ -4,10 +4,10 @@ import Slider from '@react-native-community/slider';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Course, Assignment, Term } from '../../types';
 import { useTheme } from '../../styles/theme';
-import ClassCourseCard from '../elements/ClassCourseCard';
-import DashCourseCard from '../elements/DashCourseCard';
+import ClassCourseCard from '../elements/CourseCards/ClassCourseCard';
+import DashCourseCard from '../elements/CourseCards/DashCourseCard';
 import { calculateCourseGrade } from '../../utils/courseGradeCalc';
-import AssignmentItem from '../elements/AssignmentItem';
+import AssignmentItem from '../elements/ListItems/AssignmentItem';
 import AssignmentEditor from '../elements/AssignmentEditor';
 
 const { width } = Dimensions.get('window');
@@ -162,10 +162,10 @@ export default function ClassView({ course, selectedTerm, terms, onBack }: Class
           pointerEvents="box-none"
         >
             {hasDiscrepancy ? (
-              <Text style={styles.alertText}> Calculated grade based on assignments differs from official, so offset assignment was created to resolve discrepancy. Report this bug 
+              <Text style={styles.alertText}>Calculated grade based on assignments differs from official, so offset assignment was created to resolve discrepancy. Report this bug 
               with a screenshot and your grade platform (e.g. Skyward, Powerschool, etc.) at simon.a.harrington@gmail.com</Text>
             ) : (
-              <Text style={styles.titleText}>Assignment View</Text>
+              <Text style={styles.titleText}>Class View</Text>
             )}
         </View>
 

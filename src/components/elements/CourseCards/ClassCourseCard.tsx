@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View, Dimensions, Platform } from 'react-native';
-import { useTheme } from '../../styles/theme';
-import { useGradeColor, getLetterGrade } from '../../utils/gradeUtils';
+import { useTheme } from '../../../styles/theme';
+import { useGradeColor, getLetterGrade } from '../../../utils/gradeUtils';
 import BaseCourseCard from './BaseCourseCard';
-import { Course } from '../../types';
+import { Course } from '../../../types';
 
 const { width } = Dimensions.get('window');
 const CARD_SIZE = width / 2;

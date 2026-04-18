@@ -8,11 +8,11 @@ interface SmoothSwitchProps {
 }
 
 export const SmoothSwitch = ({ value, onValueChange, theme }: SmoothSwitchProps) => {
-  const moveAnim = useRef(new Animated.Value(value ? 20 : 2)).current;
+  const moveAnim = useRef(new Animated.Value(value ? 20 : 0)).current;
 
   useEffect(() => {
     Animated.timing(moveAnim, {
-      toValue: value ? 20 : 2,
+      toValue: value ? 20 : 0,
       duration: 200,
       useNativeDriver: false,
     }).start();

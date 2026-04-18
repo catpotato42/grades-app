@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Assignment } from '../../types';
+import { Assignment } from '../../../types';
 
 interface AssignmentItemProps {
   assignment: Assignment;
@@ -79,13 +79,13 @@ const createStyles = (theme: any) => StyleSheet.create({
     borderRadius: 14,
   },
   assignmentTitle: { 
-    color: theme.colors.gradeText, 
+    color: theme.colors.textGrades, 
     fontFamily: theme.fonts.heading, 
     fontSize: 15, 
     flex: 1 
   },
   assignmentScore: { 
-    color: theme.colors.gradeText, 
+    color: theme.colors.textGrades, 
     fontFamily: theme.fonts.heading, 
     fontSize: 16 
   },
