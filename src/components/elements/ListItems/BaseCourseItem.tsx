@@ -86,15 +86,6 @@ const createStyles = (theme: any) => StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
-  infoContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  titleText: {
-    fontSize: 16,
-    fontFamily: theme.fonts?.heading,
-    marginBottom: 4,
-  },
   gradeContainer: {
     marginLeft: 10,
     justifyContent: 'center',
@@ -104,5 +95,14 @@ const createStyles = (theme: any) => StyleSheet.create({
     fontSize: 18,
     fontFamily: theme.fonts?.title,
     fontWeight: 'bold',
+  },
+  infoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  titleText: {
+    fontSize: 16,
+    fontFamily: theme.fonts?.heading,
+    marginBottom: 4,
   },
 });

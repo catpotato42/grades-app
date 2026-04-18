@@ -242,9 +242,50 @@ export default function ClassView({ course, selectedTerm, terms, onBack }: Class
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
+  addButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    borderStyle: 'dashed',
+    marginTop: 10,
+  },
+  addButtonText: {
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fonts.heading,
+    fontSize: 16,
+  },
+  alertText: { 
+    color: theme.colors.gradeRed, 
+    fontSize: 12, 
+    marginTop: -10,
+    marginLeft: 5,
+    fontFamily: theme.fonts.heading,
+    zIndex: 0,
+  },
+  arrowText: {
+    fontSize: 24,
+    color: theme.colors.textSecondary,
+    fontFamily: theme.fonts.heading,
+    marginHorizontal: 5,
+  },
+  assignmentsContainer: {
+    position: 'absolute',
+    top: '55%',
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  assignmentsScroll: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  assignmentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   backButton: {
     position: 'absolute',
@@ -266,44 +307,13 @@ const createStyles = (theme: any) => StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
-  alertText: { 
-    color: theme.colors.gradeRed, 
-    fontSize: 12, 
-    marginTop: -10,
-    marginLeft: 5,
-    fontFamily: theme.fonts.heading,
-    zIndex: 0,
+  cardWrapper: {
+    transform: [{ scale: 0.85 }],
+    marginHorizontal: -15,
   },
-  assignmentsContainer: {
-    position: 'absolute',
-    top: '55%',
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  assignmentsScroll: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  assignmentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  addButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderStyle: 'dashed',
-    marginTop: 10,
-  },
-  addButtonText: {
-    color: theme.colors.textPrimary,
-    fontFamily: theme.fonts.heading,
-    fontSize: 16,
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
   },
   dualCardRow: {
     flexDirection: 'row',
@@ -311,26 +321,16 @@ const createStyles = (theme: any) => StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
   },
-  cardWrapper: {
-    transform: [{ scale: 0.85 }],
-    marginHorizontal: -15,
-  },
-  arrowText: {
-    fontSize: 24,
-    color: theme.colors.textSecondary,
-    fontFamily: theme.fonts.heading,
-    marginHorizontal: 5,
-  },
-  titleText: {
-    color: theme.colors.textPrimary,
-    fontFamily: theme.fonts.title,
-    fontSize: 21,
-  },
   titleContainer: {
     top: '17%',
     left: 0,
     right: 0,
     alignItems: 'center',
     zIndex: 1,
+  },
+  titleText: {
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fonts.title,
+    fontSize: 21,
   },
 });

@@ -55,30 +55,6 @@ export default function PlatformSelectView({ onSelectPlatform }: PlatformSelectP
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 30,
-    paddingTop: 60,
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontFamily: theme.fonts.title,
-    color: theme.colors.textPrimary,
-    marginBottom: 10,
-  },
-  subHeader: {
-    fontSize: 16,
-    fontFamily: theme.fonts.body,
-    color: theme.colors.textSecondary,
-    marginBottom: 40,
-  },
-  listContainer: {
-    flex: 1,
-  },
   button: {
     backgroundColor: theme.colors.surface,
     paddingVertical: 20,
@@ -107,5 +83,29 @@ const createStyles = (theme: any) => StyleSheet.create({
     fontFamily: theme.fonts.body,
     color: theme.colors.textSecondary,
     textTransform: 'uppercase',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 30,
+    paddingTop: 60,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontFamily: theme.fonts.title,
+    color: theme.colors.textPrimary,
+    marginBottom: 10,
+  },
+  listContainer: {
+    flex: 1,
+  },
+  subHeader: {
+    fontSize: 16,
+    fontFamily: theme.fonts.body,
+    color: theme.colors.textSecondary,
+    marginBottom: 40,
   },
 });

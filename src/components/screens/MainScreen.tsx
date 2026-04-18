@@ -106,7 +106,31 @@ export default function MainScreen({ data }: MainScreenProps) {
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background },
+  activeIndicator: {
+    position: 'absolute',
+    bottom: -1,
+    width: 24,
+    height: 3,
+    backgroundColor: theme.colors.textPrimary,
+    borderRadius: 2
+  },
+  container: { 
+    flex: 1, 
+    backgroundColor: theme.colors.background 
+  },
+  icon: {
+    width: 26,
+    height: 26,
+    maxWidth: 26,
+    maxHeight: 26,
+    marginBottom: 1,
+  },
+  labelActive: { 
+    color: theme.colors.textPrimary 
+  },
+  labelInactive: { 
+    color: theme.colors.textSecondary 
+  },
   tabBar: {
     flexDirection: 'row',
     backgroundColor: theme.colors.surface,
@@ -126,26 +150,9 @@ const createStyles = (theme: any) => StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: theme.colors.border,
   },
-  icon: {
-    width: 26,
-    height: 26,
-    maxWidth: 26,
-    maxHeight: 26,
-    marginBottom: 1,
-  },
   tabLabel: { 
     fontSize: 10, 
     fontFamily: theme.fonts.heading, 
     marginTop: 2,
   },
-  labelActive: { color: theme.colors.textPrimary },
-  labelInactive: { color: theme.colors.textSecondary },
-  activeIndicator: {
-    position: 'absolute',
-    bottom: -1,
-    width: 24,
-    height: 3,
-    backgroundColor: theme.colors.textPrimary,
-    borderRadius: 2
-  }
 });

@@ -111,9 +111,32 @@ export default function DashboardView({ data }: DashboardProps) {
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
+  columnWrapper: {
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  scrollContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 40,
+  },
+  tabButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    marginRight: 10,
+    //thick line is always there but transparent unless active
+    borderBottomWidth: 3, 
+    marginBottom: -1,
+  },
+  tabButtonActive: {
+    borderBottomColor: theme.colors.textPrimary,
+  },
+  tabButtonInactive: {
+    borderBottomColor: 'transparent',
   },
   tabContainer: {
     //continuous thin line across the screen
@@ -126,43 +149,16 @@ const createStyles = (theme: any) => StyleSheet.create({
     paddingHorizontal: 16,
     flexDirection: 'row',
   },
-  tabButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    marginRight: 10,
-    //thick line is always there but transparent unless active
-    borderBottomWidth: 3, 
-    marginBottom: -1,
-  },
-  tabButtonInactive: {
-    borderBottomColor: 'transparent',
-  },
-  tabButtonActive: {
-    borderBottomColor: theme.colors.textPrimary,
-  },
   tabText: {
     fontSize: 15,
     fontFamily: theme.fonts.heading,
-    //by default light gray
     color: theme.colors.textSecondary,
     letterSpacing: 0.5,
   },
   tabTextActive: {
-    //white
     color: theme.colors.textPrimary,
   },
   tabTextUnavailable: {
-    //darker gray
     color: theme.colors.textUnavailable, 
   },
-
-  scrollContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 40,
-  },
-  columnWrapper: {
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  }
 });

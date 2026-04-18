@@ -12,8 +12,6 @@ interface GPAViewProps {
 
 type GPAType = 'Weighted' | 'Unweighted';
 
-const { width } = Dimensions.get('window');
-
 export default function GPAView({ data }: GPAViewProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -97,7 +95,7 @@ export default function GPAView({ data }: GPAViewProps) {
       
       const credits = course.credits ?? 1.0;
       
-      // Use finalGrade first (past courses). If undefined, use current term grades.
+      //use finalGrade first (past courses). If undefined, use current term grades.
       let gradeObj = course.finalGrade;
       
       if (!gradeObj) {
@@ -189,40 +187,16 @@ const createStyles = (theme: any) => StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  tabContainer: {
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border || theme.colors.textSecondary,
-    marginTop: 10,
-    marginBottom: 15,
-  },
-  tabScroll: {
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  tabButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    marginRight: 10,
-    borderBottomWidth: 3,
-    marginBottom: -1,
-  },
-  tabButtonInactive: {
-    borderBottomColor: 'transparent',
-  },
-  tabButtonActive: {
-    borderBottomColor: theme.colors.textPrimary,
-  },
-  tabText: {
-    fontSize: 15,
-    fontFamily: theme.fonts.heading,
+  includeText: {
+    fontSize: 14,
+    fontFamily: theme.fonts.body,
     color: theme.colors.textSecondary,
-    letterSpacing: 0.5,
+    marginRight: 8,
   },
-  tabTextActive: {
-    color: theme.colors.textPrimary,
+  itemsWrapper: {
+    paddingHorizontal: 20,
+    paddingBottom: 10,
   },
-  
   gpaDisplayContainer: {
     alignItems: 'center',
     paddingVertical: 30,
@@ -237,6 +211,12 @@ const createStyles = (theme: any) => StyleSheet.create({
   listContainer: {
     flex: 1,
   },
+  pastCoursesHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingRight: 20,
+  },
   sectionHeader: {
     fontSize: 18,
     fontFamily: theme.fonts.heading,
@@ -245,25 +225,42 @@ const createStyles = (theme: any) => StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 20,
   },
-  pastCoursesHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    paddingRight: 20,
-  },
   switchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
   },
-  includeText: {
-    fontSize: 14,
-    fontFamily: theme.fonts.body,
-    color: theme.colors.textSecondary,
-    marginRight: 8,
+  tabButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    marginRight: 10,
+    borderBottomWidth: 3,
+    marginBottom: -1,
   },
-  itemsWrapper: {
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-  }
+  tabButtonInactive: {
+    borderBottomColor: 'transparent',
+  },
+  tabButtonActive: {
+    borderBottomColor: theme.colors.textPrimary,
+  },
+  tabContainer: {
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border || theme.colors.textSecondary,
+    marginTop: 10,
+    marginBottom: 15,
+  },
+  tabScroll: {
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  tabText: {
+    fontSize: 15,
+    fontFamily: theme.fonts.heading,
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.5,
+  },
+  tabTextActive: {
+    color: theme.colors.textPrimary,
+  },
 });

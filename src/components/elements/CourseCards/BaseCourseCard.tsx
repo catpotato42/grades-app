@@ -51,11 +51,19 @@ export default function BaseCourseCard({
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
+  bottomContainer: {
+    alignItems: 'center'
+  },
   cardBase: {
     borderRadius: 22,
     padding: CARD_PADDING,
     justifyContent: 'space-between',
     position: 'relative',
+  },
+  centerContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   courseTitle: {
     color: theme.colors.textGrades,
@@ -63,18 +71,10 @@ const createStyles = (theme: any) => StyleSheet.create({
     fontFamily: theme.fonts.title,
     letterSpacing: 0.5,
   },
-  centerContainer: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   letterGradeText: {
     fontSize: 55,
     fontFamily: theme.fonts.gradeDisplay,
     color: theme.colors.textGrades,
     letterSpacing: -2,
   },
-  bottomContainer: {
-    alignItems: 'center'
-  }
 });

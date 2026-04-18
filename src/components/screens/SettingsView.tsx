@@ -74,20 +74,6 @@ const createStyles = (theme: any) => StyleSheet.create({
     marginTop: 60,
     marginBottom: 20,
   },
-  sectionHeader: {
-    color: theme.colors.textSecondary,
-    fontSize: 13,
-    fontFamily: theme.fonts.heading,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-    marginTop: 25,
-    paddingLeft: 10,
-  },
-  sectionContainer: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 15,
-    overflow: 'hidden',
-  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -101,5 +87,19 @@ const createStyles = (theme: any) => StyleSheet.create({
     color: theme.colors.textPrimary,
     fontSize: 16,
     fontFamily: theme.fonts.heading,
+  },
+  sectionHeader: {
+    color: theme.colors.textSecondary,
+    fontSize: 13,
+    fontFamily: theme.fonts.heading,
+    textTransform: 'uppercase',
+    marginBottom: 8,
+    marginTop: 25,
+    paddingLeft: 10,
+  },
+  sectionContainer: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 15,
+    overflow: 'hidden',
   },
 });

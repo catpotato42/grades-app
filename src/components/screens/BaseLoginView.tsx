@@ -91,38 +91,6 @@ export default function BaseLoginView({
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background
-  },
-  flex: {
-    flex: 1
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 40
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: theme.fonts.title,
-    marginBottom: 40,
-    color: theme.colors.textPrimary,
-    textAlign: 'center',
-  },
-  errorText: {
-    color: theme.colors.gradeRed,
-    textAlign: 'center',
-    marginBottom: 15,
-    fontFamily: theme.fonts.heading,
-  },
-  input: {
-    height: 50, borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    marginBottom: 25, fontSize: 16,
-    fontFamily: theme.fonts.heading,
-    color: theme.colors.textPrimary,
-  },
   button: {
     backgroundColor: theme.colors.buttonPrimary,
     height: 52,
@@ -138,5 +106,37 @@ const createStyles = (theme: any) => StyleSheet.create({
     color: theme.colors.background,
     fontSize: 16,
     fontFamily: theme.fonts.heading,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 40
+  },
+  errorText: {
+    color: theme.colors.gradeRed,
+    textAlign: 'center',
+    marginBottom: 15,
+    fontFamily: theme.fonts.heading,
+  },
+  flex: {
+    flex: 1
+  },
+  input: {
+    height: 50, borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    marginBottom: 25, fontSize: 16,
+    fontFamily: theme.fonts.heading,
+    color: theme.colors.textPrimary,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: theme.fonts.title,
+    marginBottom: 40,
+    color: theme.colors.textPrimary,
+    textAlign: 'center',
   },
 });

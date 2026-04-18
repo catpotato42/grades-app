@@ -55,6 +55,9 @@ export default function ArchiveView({ data }: ArchiveViewProps) {
               size={width / 2}
             />
           </View>
+          <Text style={styles.absencesText}>
+            Absences: {selectedCourse.absences ?? 'N/A'}
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -117,9 +120,56 @@ export default function ArchiveView({ data }: ArchiveViewProps) {
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
+  absencesText: {
+    marginTop: 20,
+    fontSize: 18,
+    fontFamily: theme.fonts.heading,
+    color: theme.colors.textPrimary,
+  },
+  addButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+    borderStyle: 'dashed',
+    marginTop: 10,
+  },
+  addButtonText: {
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fonts.heading,
+    fontSize: 16,
+  },
+  alertText: { 
+    color: theme.colors.gradeRed, 
+    fontSize: 12, 
+    marginTop: -10,
+    marginLeft: 5,
+    fontFamily: theme.fonts.heading,
+    zIndex: 0,
+  },
+  arrowText: {
+    fontSize: 24,
+    color: theme.colors.textSecondary,
+    fontFamily: theme.fonts.heading,
+    marginHorizontal: 5,
+  },
+  assignmentsContainer: {
+    position: 'absolute',
+    top: '55%',
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  assignmentsScroll: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  assignmentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   backButton: {
     position: 'absolute',
@@ -141,44 +191,18 @@ const createStyles = (theme: any) => StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
-  alertText: { 
-    color: theme.colors.gradeRed, 
-    fontSize: 12, 
-    marginTop: -10,
-    marginLeft: 5,
-    fontFamily: theme.fonts.heading,
-    zIndex: 0,
+  cardWrapper: {
+    transform: [{ scale: 0.85 }],
+    marginHorizontal: -15,
   },
-  assignmentsContainer: {
-    position: 'absolute',
-    top: '55%',
-    left: 0,
-    right: 0,
-    bottom: 0,
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
   },
-  assignmentsScroll: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  assignmentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  addButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderStyle: 'dashed',
-    marginTop: 10,
-  },
-  addButtonText: {
+  courseTitle: {
+    fontSize: 32,
+    fontFamily: theme.fonts.title,
     color: theme.colors.textPrimary,
-    fontFamily: theme.fonts.heading,
-    fontSize: 16,
   },
   dualCardRow: {
     flexDirection: 'row',
@@ -186,20 +210,12 @@ const createStyles = (theme: any) => StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
   },
-  cardWrapper: {
-    transform: [{ scale: 0.85 }],
-    marginHorizontal: -15,
+  listContainer: {
+    flex: 1,
   },
-  arrowText: {
-    fontSize: 24,
-    color: theme.colors.textSecondary,
-    fontFamily: theme.fonts.heading,
-    marginHorizontal: 5,
-  },
-  titleText: {
-    color: theme.colors.textPrimary,
-    fontFamily: theme.fonts.title,
-    fontSize: 30,
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
   },
   titleContainer: {
     top: '10%',
@@ -208,17 +224,21 @@ const createStyles = (theme: any) => StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
-  courseTitle: {
+  titleText: {
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fonts.title,
+    fontSize: 30,
+  },
+  screenTitleContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+    zIndex: 1,
+  },
+  screenTitleText: {
     fontSize: 32,
     fontFamily: theme.fonts.title,
     color: theme.colors.textPrimary,
-  },
-  listContainer: {
-    flex: 1,
-  },
-  listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
   },
   section: {
     marginBottom: 15,
@@ -231,16 +251,5 @@ const createStyles = (theme: any) => StyleSheet.create({
     marginTop: 15,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-  },
-  screenTitleContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 10,
-    zIndex: 1,
-  },
-  screenTitleText: {
-    fontSize: 32,
-    fontFamily: theme.fonts.title,
-    color: theme.colors.textPrimary,
   },
 });

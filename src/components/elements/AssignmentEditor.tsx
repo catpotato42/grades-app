@@ -153,13 +153,6 @@ const createStyles = (theme: any) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  editorTitle: { 
-    color: theme.colors.textPrimary,
-    fontSize: 20,
-    fontFamily: theme.fonts.heading,
-    textAlign: 'center',
-    marginBottom: 40
-  },
   editRow: { 
     flexDirection: 'row',
     alignItems: 'center',
@@ -167,10 +160,12 @@ const createStyles = (theme: any) => StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 10
   },
-  slider: { 
-    flex: 1,
-    height: 40,
-    marginRight: 20
+  editorTitle: { 
+    color: theme.colors.textPrimary,
+    fontSize: 20,
+    fontFamily: theme.fonts.heading,
+    textAlign: 'center',
+    marginBottom: 40
   },
   inputContainer: { 
     flexDirection: 'row',
@@ -201,5 +196,10 @@ const createStyles = (theme: any) => StyleSheet.create({
     fontFamily: theme.fonts.heading,
     marginHorizontal: 8,
     paddingBottom: 2
+  },
+  slider: { 
+    flex: 1,
+    height: 40,
+    marginRight: 20
   },
 });

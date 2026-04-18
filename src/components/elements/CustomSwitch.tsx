@@ -30,13 +30,6 @@ export const SmoothSwitch = ({ value, onValueChange, theme }: SmoothSwitchProps)
 };
 
 const styles = StyleSheet.create({
-  track: {
-    width: 44,
-    height: 24,
-    borderRadius: 12,
-    padding: 2,
-    justifyContent: 'center',
-  },
   thumb: {
     width: 20,
     height: 20,
@@ -46,5 +39,12 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
+  },
+  track: {
+    width: 44,
+    height: 24,
+    borderRadius: 12,
+    padding: 2,
+    justifyContent: 'center',
   },
 });

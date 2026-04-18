@@ -54,10 +54,30 @@ export default function AssignmentItem({ assignment, originalAssignment, isIgnor
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
+  assignmentBar: {
+    flex: 1, 
+    flexDirection: 'row', 
+    justifyContent: 'space-between',
+    alignItems: 'center', 
+    paddingVertical: 16, 
+    paddingHorizontal: 20, 
+    borderRadius: 14,
+  },
   assignmentRow: { 
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
+  },
+  assignmentScore: { 
+    color: theme.colors.textGrades, 
+    fontFamily: theme.fonts.heading, 
+    fontSize: 16 
+  },
+  assignmentTitle: { 
+    color: theme.colors.textGrades, 
+    fontFamily: theme.fonts.heading, 
+    fontSize: 15, 
+    flex: 1 
   },
   checkBox: {
     width: 24, height: 24, borderRadius: 4, borderWidth: 2,
@@ -68,25 +88,5 @@ const createStyles = (theme: any) => StyleSheet.create({
     color: theme.colors.textPrimary, 
     fontSize: 14, 
     fontWeight: 'bold' 
-  },
-  assignmentBar: {
-    flex: 1, 
-    flexDirection: 'row', 
-    justifyContent: 'space-between',
-    alignItems: 'center', 
-    paddingVertical: 16, 
-    paddingHorizontal: 20, 
-    borderRadius: 14,
-  },
-  assignmentTitle: { 
-    color: theme.colors.textGrades, 
-    fontFamily: theme.fonts.heading, 
-    fontSize: 15, 
-    flex: 1 
-  },
-  assignmentScore: { 
-    color: theme.colors.textGrades, 
-    fontFamily: theme.fonts.heading, 
-    fontSize: 16 
   },
 });

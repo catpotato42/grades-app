@@ -52,16 +52,16 @@ export default function DashCourseCard({courseName, grade, letterGrade, period, 
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
-  subText: {
-    color: theme.colors.textGrades,
-    fontSize: 11,
-    fontFamily: theme.fonts.heading,
-    opacity: 0.8,
-  },
   percentageText: {
     fontSize: 20,
     fontFamily: theme.fonts.heading,
     color: theme.colors.textGrades,
     opacity: 0.9,
+  },
+  subText: {
+    color: theme.colors.textGrades,
+    fontSize: 11,
+    fontFamily: theme.fonts.heading,
+    opacity: 0.8,
   },
 });
