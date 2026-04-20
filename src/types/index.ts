@@ -28,6 +28,18 @@ export interface CategoryWeight {
   weight: number; //decimal, .5 for 50%
 }
 
+//scrape newer PAST courses earlier in the output file, as the archive lists courses starting from the top of the input file,
+//meaning that those courses are at the top (first seen) when entering the archive screen, so you should be able to scroll to 
+//see OLDER courses. if the course is in any of our current terms (if it's during the current "year"?) it will be sorted based on our
+//terms array, so [Q1, Q2, etc.] in reverse order. To review,
+//Q3 11th grade (Current term)
+//Q2
+//Q1
+//10th grade 2nd sem
+//10th grade 1st sem
+//9th grade 2nd sem
+//...
+//should be listed as courses: [{any of Q3, Q2, Q1 anywhere in the array}, {10th grade 2nd sem}, {10th grade 1st sem}, etc.]
 export interface Course {
   id: string; //sourcedId - Skyward, 
   title: string;

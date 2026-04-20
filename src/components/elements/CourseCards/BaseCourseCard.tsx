@@ -13,6 +13,8 @@ interface BaseCourseCardProps {
   style: { width: number; height: number; [key: string]: any }; //size must be specified
   topContent?: React.ReactNode;
   bottomContent?: React.ReactNode;
+  fontSizeMult?: number;
+  bDisplayTitle?: boolean;
 }
 
 export default function BaseCourseCard({ 
@@ -22,7 +24,9 @@ export default function BaseCourseCard({
   backgroundColor, 
   style, 
   topContent,
-  bottomContent 
+  bottomContent,
+  fontSizeMult = 1,
+  bDisplayTitle = true,
 }: BaseCourseCardProps) {
   const theme = useTheme();
   const s = createStyles(theme);
@@ -31,14 +35,16 @@ export default function BaseCourseCard({
     <View style={[s.cardBase, { backgroundColor }, style]}>
 
       <View style={[s.centerContainer, {marginTop: offset}]}>
-        <Text style={s.letterGradeText}>{gradeDisplay}</Text>
+        <Text style={[s.letterGradeText, {fontSize: 55*fontSizeMult}]}>{gradeDisplay}</Text>
       </View>
 
       {/* top left */}
       <View>
-        <Text style={s.courseTitle} numberOfLines={1}>
-          {title.toUpperCase() || "—"}
-        </Text>
+        {bDisplayTitle &&
+          <Text style={[s.courseTitle, {fontSize: 14*fontSizeMult}]} numberOfLines={1}>
+            {title.toUpperCase() || "-"}
+          </Text>
+        }
         {/* other things go here */}
         {topContent}
       </View>
@@ -72,7 +78,6 @@ const createStyles = (theme: any) => StyleSheet.create({
     letterSpacing: 0.5,
   },
   letterGradeText: {
-    fontSize: 55,
     fontFamily: theme.fonts.gradeDisplay,
     color: theme.colors.textGrades,
     letterSpacing: -2,

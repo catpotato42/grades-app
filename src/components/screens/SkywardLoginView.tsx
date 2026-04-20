@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { TextInput, StyleSheet } from 'react-native';
 import { useTheme } from '../../styles/theme';
 import BaseLoginView from './BaseLoginView';
-import { SkywardDataBridge } from '../../services/skywardDataBridge';
+import { SkywardProvider } from '../../services/skywardProvider';
+import * as SecureStore from 'expo-secure-store';
 
 interface SkywardLoginProps {
   onLoginSuccess: (data: any) => void;
@@ -30,7 +31,10 @@ export default function SkywardLoginView({ onLoginSuccess }: SkywardLoginProps) 
     setLoading(true);
     setError(null);
     try {
-      const fetchedData = await SkywardDataBridge.login(state, district, username, password);
+      const success = await SkywardProvider.login({ username, password });
+      if (!success) throw new Error("Invalid credentials.");
+      await SecureStore.setItemAsync('ACTIVE_PLATFORM', 'SKYWARD');
+      const fetchedData = await SkywardProvider.fetchData();
       onLoginSuccess(fetchedData);
     } catch (err: any) {
       setError(err.message || "Failed to login to Skyward.");

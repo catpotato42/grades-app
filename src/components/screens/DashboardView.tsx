@@ -6,6 +6,7 @@ import { AppSettings } from '../../config/settings';
 import DashCourseCard from '../elements/CourseCards/DashCourseCard';
 import { AcademicData, Course } from '../../types';
 import ClassView from './ClassView';
+import RefreshButton from '../elements/RefreshButton';
 
 interface DashboardProps {
   data: AcademicData;
@@ -45,6 +46,15 @@ export default function DashboardView({ data }: DashboardProps) {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={{ flex: 1, display: selectedCourse ? 'none' : 'flex' }}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.dashboardTitle}>Dashboard</Text>
+          <RefreshButton 
+            onRefresh={async () => {
+              // Mock delay for testing flow
+              await new Promise((resolve, reject) => setTimeout(resolve, 1500));
+            }} 
+          />
+        </View>
         <View style={styles.tabContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabScroll}>
             {terms.map((termDef) => {
@@ -118,6 +128,19 @@ const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  dashboardTitle: {
+    fontSize: 32,
+    fontFamily: theme.fonts.title,
+    color: theme.colors.textPrimary,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 5,
   },
   scrollContainer: {
     paddingHorizontal: 20,

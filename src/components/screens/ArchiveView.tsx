@@ -4,7 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../styles/theme';
 import { AcademicData, Course } from '../../types';
 import ArchiveCourseItem from '../elements/ListItems/ArchiveCourseItem';
-import DashCourseCard from '../elements/CourseCards/DashCourseCard';
+import ArchiveCourseCard from '../elements/CourseCards/ArchiveCourseCard';
+import ArchiveAssignmentItem from '../elements/ListItems/ArchiveAssignmentItem';
 
 const { width } = Dimensions.get('window');
 
@@ -34,6 +35,9 @@ export default function ArchiveView({ data }: ArchiveViewProps) {
   }, {} as Record<string, Course[]>);
 
   if (selectedCourse && selectedTermId) {
+    const termAssignments = selectedCourse.assignments.filter(
+      a => a.termId === selectedTermId
+    );
     return (
       <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <Pressable onPress={() => setSelectedCourse(null)} style={styles.backButton}>
@@ -45,19 +49,31 @@ export default function ArchiveView({ data }: ArchiveViewProps) {
         </View>
         <View style={styles.cardContainer}>
           <View style={styles.cardWrapper}>
-            <DashCourseCard 
-              courseName={selectedCourse.title}
-              grade={selectedCourse.officialGrades[selectedTermId]?.numeric}
-              letterGrade={selectedCourse.officialGrades[selectedTermId]?.letter}
-              period={selectedCourse.period?.toString()}
-              teacher={selectedCourse.teacher}
-              onPress={() => {}}
-              size={width / 2}
+            <ArchiveCourseCard
+              course= {selectedCourse}
+              selectedTerm={selectedTermId}
+              fontSizeMult={1.5}
+              size={ width / 1.5 }
             />
           </View>
-          <Text style={styles.absencesText}>
-            Absences: {selectedCourse.absences ?? 'N/A'}
-          </Text>
+          <ScrollView style={styles.assignmentsContainer} contentContainerStyle={styles.assignmentsScroll}>
+            <Text style={styles.absencesText}>
+              Overall Absences: {selectedCourse.absences ?? 'Unknown'}
+            </Text>
+            <Text style={[styles.absencesText, { marginTop: 15, marginBottom: 15 }]}>
+              Assignments:
+            </Text>
+            {termAssignments.length === 0 && (
+              <Text style={[styles.absencesText, { marginTop: 0 }]}>-</Text>
+            )}
+
+            {termAssignments.map(assignment => (
+              <ArchiveAssignmentItem 
+                key={assignment.id} 
+                assignment={assignment} 
+              />
+            ))}
+          </ScrollView>
         </View>
       </SafeAreaView>
     );
@@ -121,10 +137,11 @@ export default function ArchiveView({ data }: ArchiveViewProps) {
 
 const createStyles = (theme: any) => StyleSheet.create({
   absencesText: {
-    marginTop: 20,
+    marginTop: 10,
     fontSize: 18,
     fontFamily: theme.fonts.heading,
     color: theme.colors.textPrimary,
+    textAlign: 'center',
   },
   addButton: {
     alignItems: 'center',
@@ -156,20 +173,12 @@ const createStyles = (theme: any) => StyleSheet.create({
     marginHorizontal: 5,
   },
   assignmentsContainer: {
-    position: 'absolute',
-    top: '55%',
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
+    width: '100%',
   },
   assignmentsScroll: {
     paddingHorizontal: 20,
     paddingBottom: 40,
-  },
-  assignmentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
   },
   backButton: {
     position: 'absolute',

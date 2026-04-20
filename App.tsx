@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useEffect } from 'react';
 
+import { SyncManager } from './src/services/syncManager';
 import PlatformSelectView, { PlatformId } from './src/components/screens/PlatformSelectView';
 import SkywardLoginView from './src/components/screens/SkywardLoginView';
+import CanvasLoginView from './src/components/screens/CanvasLoginView';
 
 import MainScreen from './src/components/screens/MainScreen';
 import { AcademicData } from './src/types';
@@ -33,6 +36,22 @@ export default function App() {
     Inter_800ExtraBold
   });
 
+  useEffect(() => {
+    const tryAutoLogin = async () => {
+      try {
+        const data = await SyncManager.refreshData();
+        setAcademicData(data);
+        setIsLoggedIn(true);
+      } catch (e) {
+        console.log("No valid session found, manual login required.");
+      }
+    };
+
+    if (fontsLoaded && !isLoggedIn) {
+      tryAutoLogin();
+    }
+  }, [fontsLoaded]);
+
   if (!fontsLoaded) {
     return null; 
   }
@@ -52,6 +71,9 @@ export default function App() {
     //if platform selected, show the selected platform
     if (activePlatform === 'skyward') {
       return <SkywardLoginView onLoginSuccess={handleLoginSuccess} />;
+    }
+    if (activePlatform === 'canvas') {
+      return <CanvasLoginView onLoginSuccess={handleLoginSuccess} />;
     }
 
     //default: select platform

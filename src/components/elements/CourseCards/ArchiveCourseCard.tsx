@@ -12,9 +12,10 @@ interface ClassCourseCardProps {
   course: Course;
   selectedTerm: string;
   size?: number;
+  fontSizeMult?: number;
 }
 
-export default function ClassCourseCard({ course, selectedTerm, size=CARD_SIZE }: ClassCourseCardProps) {
+export default function ClassCourseCard({ course, selectedTerm, size=CARD_SIZE, fontSizeMult=1 }: ClassCourseCardProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
   
@@ -26,34 +27,34 @@ export default function ClassCourseCard({ course, selectedTerm, size=CARD_SIZE }
 
   return (
     <BaseCourseCard
-      title={course.title || "-"}
-      gradeDisplay={letterGrade || "-"}
+      title={course.title || "—"}
+      gradeDisplay={letterGrade || "—"}
       backgroundColor={backgroundColor}
       style={{ width: size, height: size }}
       offset={18}
       topContent={
         <>
-          <Text style={styles.subText}>{course.teacher ?? "-"}</Text>
-          <Text style={styles.subText}>{course.period ? `Period ${course.period}` : "-"}</Text>
+          <Text style={[styles.subText, {fontSize:15*fontSizeMult}]}>{course.teacher ?? "—"}</Text>
+          <Text style={[styles.subText, {fontSize:15*fontSizeMult}]}>{course.period ? `Period ${course.period}` : "—"}</Text>
         </>
       }
       bottomContent={
-        <Text style={styles.percentageText}>{grade !== undefined ? `${grade}%` : "-%"}</Text>
+        <Text style={[styles.percentageText, {fontSize:20*fontSizeMult}]}>{grade !== undefined ? `${grade}%` : "—%"}</Text>
       }
+      fontSizeMult={fontSizeMult}
+      bDisplayTitle={false}
     />
   );
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
   percentageText: {
-    fontSize: 20,
     fontFamily: theme.fonts.heading,
     color: theme.colors.textGrades,
     opacity: 0.9,
   },
   subText: {
     color: theme.colors.textGrades,
-    fontSize: 11,
     fontFamily: theme.fonts.heading,
     opacity: 0.8,
   },

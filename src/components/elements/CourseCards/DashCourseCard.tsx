@@ -25,7 +25,7 @@ export default function DashCourseCard({courseName, grade, letterGrade, period, 
   return (
     <Pressable onPress={onPress}>
       <BaseCourseCard
-        title={courseName || "—"}
+        title={courseName || "-"}
         gradeDisplay={letterGrade || getLetterGrade(grade)}
         offset={15}
         backgroundColor={backgroundColor}
@@ -33,16 +33,16 @@ export default function DashCourseCard({courseName, grade, letterGrade, period, 
         topContent={
           <>
             <Text style={styles.subText}>
-              {teacher ? teacher.substring(teacher.indexOf(' ') + 1) : "—"}
+              {teacher ? teacher.substring(teacher.indexOf(' ') + 1) : "-"}
             </Text>
             <Text style={styles.subText}>
-              {period ? `Period ${period}` : "—"}
+              {period ? `Period ${period}` : "-"}
             </Text>
           </>
         }
         bottomContent={
           <Text style={styles.percentageText}>
-            {grade !== undefined ? `${grade}%` : "—%"}
+            {grade !== undefined ? `${grade}%` : "-%"}
           </Text>
         }
       >
