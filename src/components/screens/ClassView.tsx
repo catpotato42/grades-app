@@ -42,7 +42,11 @@ export default function ClassView({ course, selectedTerm, terms, onBack }: Class
     const currentDisplayGrade = initialCalc !== null ? Math.round(initialCalc) : null;
     
     if (official !== undefined && currentDisplayGrade != official) {
-      setHasDiscrepancy(true);
+      if (initialCalc !== null && Math.abs(initialCalc - official) > 1.25) {
+        setHasDiscrepancy(true);
+      } else {
+        setHasDiscrepancy(false);
+      }
       const validAssigns = termSpecificAssignments.filter(a => a.score !== undefined && a.totalPoints !== undefined);
       let targetScore = 0;
       let targetCategory = 'Calibration';
@@ -57,24 +61,26 @@ export default function ClassView({ course, selectedTerm, terms, onBack }: Class
         }
       } else if (course.categoryWeights && course.categoryWeights.length > 0) {
         //if it's a weights system, calculate points this way
-        const firstCat = course.categoryWeights.find(cw => validAssigns.some(a => a.category === cw.name));
+        const firstCat = course.categoryWeights.find(cw => cw.weight > 0 && validAssigns.some(a => a.category === cw.name)) 
+                      || course.categoryWeights.find(cw => cw.weight > 0);
         if (firstCat) {
           targetCategory = firstCat.name;
-          const catPossible = validAssigns.filter(a => a.category === firstCat.name).reduce((acc, a) => acc + (a.totalPoints! * (a.weight || 1)), 0);
-          const weightRatio = firstCat.weight / course.categoryWeights.reduce((acc, cw) => acc + (validAssigns.some(a => a.category === cw.name) ? cw.weight : 0), 0);
-          targetScore = (((official - initialCalc) / 100) / weightRatio) * catPossible;
+          const catPossible = validAssigns.filter(a => a.category === firstCat.name).reduce((acc, a) => acc + (a.totalPoints! * (a.weight ?? 1)), 0);
+          const totalActiveWeight = course.categoryWeights.reduce((acc, cw) => acc + (validAssigns.some(a => a.category === cw.name) ? cw.weight : 0), 0);
+          const weightRatio = firstCat.weight / (totalActiveWeight || 1);
+          targetScore = (weightRatio > 0) ? (((official - initialCalc) / 100) / weightRatio) * catPossible : 0;
         }
       } else {
         //if it's a total points system, calculate this way.
-        const possible = validAssigns.reduce((acc, a) => acc + (a.totalPoints! * (a.weight || 1)), 0);
-        const earned = validAssigns.reduce((acc, a) => acc + (a.score! * (a.weight || 1)), 0);
+        const possible = validAssigns.reduce((acc, a) => acc + (a.totalPoints! * (a.weight ?? 1)), 0);
+        const earned = validAssigns.reduce((acc, a) => acc + (a.score! * (a.weight ?? 1)), 0);
         targetScore = (official / 100) * possible - earned;
       }
 
       const offsetAssignment: Assignment = {
         id: 'sys-offset', 
         title: 'Offset Assignment', 
-        termId: activeTermIds[activeTermIds.length - 1], //if an aggregator term uses last subterm
+        termId: activeTermIds[activeTermIds.length - 1], //if an aggregator term, uses last subterm
         category: targetCategory,
         score: parseFloat(targetScore.toFixed(2)), 
         totalPoints: targetTotalPoints, 
@@ -107,10 +113,14 @@ export default function ClassView({ course, selectedTerm, terms, onBack }: Class
 
   const handleAddAssignment = () => {
     setIsEdited(true);
+    //make sure we have a valid cat, can't mess up weight calc by adding a new cat that makes sum(weights) > 100%
+    const defaultCategory = localCourse.categoryWeights?.find(cw => cw.weight > 0)?.name 
+                         || localCourse.categoryWeights?.[0]?.name 
+                         || 'Uncategorized';
     const newAssign: Assignment = {
       id: 'mock-' + Date.now(),
       title: 'New Assignment',
-      category: localCourse.categoryWeights?.[0]?.name || 'Uncategorized',
+      category: defaultCategory,
       score: 100,
       totalPoints: 100,
       isMock: true,
@@ -175,11 +185,8 @@ export default function ClassView({ course, selectedTerm, terms, onBack }: Class
               {/* dashboard, scaled to fit */}
               <View style={styles.cardWrapper}>
                 <DashCourseCard 
-                  courseName={baseCourse.title}
-                  grade={baseCourse.officialGrades[selectedTerm]?.numeric}
-                  letterGrade={baseCourse.officialGrades[selectedTerm]?.letter}
-                  period={baseCourse.period?.toString()}
-                  teacher={baseCourse.teacher}
+                  course={baseCourse}
+                  selectedTerm={selectedTerm}
                   onPress={() => {}}
                   size={DUAL_VIEW_CARD_SIZE}
                 />
@@ -232,6 +239,7 @@ export default function ClassView({ course, selectedTerm, terms, onBack }: Class
         <AssignmentEditor 
           assignment={selectedAssignment}
           originalAssignment={baseCourse.assignments.find(a => a.id === selectedAssignment.id)}
+          course={localCourse}
           theme={theme}
           onBack={() => setSelectedAssignment(null)}
           onUpdateField={updateAssignmentField}

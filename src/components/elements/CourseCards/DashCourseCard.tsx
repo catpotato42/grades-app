@@ -3,40 +3,43 @@ import { StyleSheet, Text, Dimensions, Pressable } from 'react-native';
 import { useTheme } from '../../../styles/theme';
 import { useGradeColor, getLetterGrade } from '../../../utils/gradeUtils';
 import BaseCourseCard from './BaseCourseCard';
+import { Course } from '../../../types';
 
 const { width } = Dimensions.get('window');
 const CARD_SIZE = (width - 50) / 2;
 
 interface DashCourseCardProps {
-  courseName?: string;
-  grade?: number;
-  letterGrade?: string;
-  period?: string;
-  teacher?: string;
+  course: Course;
+  selectedTerm: string;
   size?: number;
   onPress: () => void;
 }
 
-export default function DashCourseCard({courseName, grade, letterGrade, period, teacher, onPress, size=CARD_SIZE}: DashCourseCardProps) {
+export default function DashCourseCard({ course, selectedTerm, onPress, size = CARD_SIZE }: DashCourseCardProps) {
+
   const theme = useTheme();
+  const termGrade = course.officialGrades[selectedTerm];
+
+  const grade = termGrade?.numeric !== undefined ? termGrade.numeric : undefined;
+  const letterGrade = termGrade?.letter || getLetterGrade(grade);
   const backgroundColor = useGradeColor(grade);
   const styles = createStyles(theme);
 
   return (
     <Pressable onPress={onPress}>
       <BaseCourseCard
-        title={courseName || "-"}
-        gradeDisplay={letterGrade || getLetterGrade(grade)}
+        title={course.title || "-"}
+        gradeDisplay={letterGrade || "-"}
         offset={15}
         backgroundColor={backgroundColor}
         style={{ width: size, height: size }}
         topContent={
           <>
             <Text style={styles.subText}>
-              {teacher ? teacher.substring(teacher.indexOf(' ') + 1) : "-"}
+              {course.teacher ? course.teacher.substring(course.teacher.indexOf(' ') + 1) : "-"}
             </Text>
             <Text style={styles.subText}>
-              {period ? `Period ${period}` : "-"}
+              {course.period ? `Period ${course.period}` : "-"}
             </Text>
           </>
         }
@@ -45,8 +48,7 @@ export default function DashCourseCard({courseName, grade, letterGrade, period, 
             {grade !== undefined ? `${grade}%` : "-%"}
           </Text>
         }
-      >
-      </BaseCourseCard>
+      />
     </Pressable>
   );
 }

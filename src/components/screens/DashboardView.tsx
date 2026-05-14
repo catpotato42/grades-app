@@ -88,20 +88,14 @@ export default function DashboardView({ data }: DashboardProps) {
           contentContainerStyle={styles.scrollContainer}
           columnWrapperStyle={styles.columnWrapper}
           renderItem={({ item }) => {
-        // Strictly fetch the grade for the currently selected tab. No fallbacks!
-        const termGrade = item.officialGrades?.[selectedTerm]; 
-
-        return (
-          <DashCourseCard 
-            courseName={item.title}
-            grade={termGrade?.numeric}
-            letterGrade={termGrade?.letter}
-            period={item.period?.toString()}
-            teacher={item.teacher}
-            onPress={() => setSelectedCourse(item)}
-          />
-        );
-      }}
+            return (
+              <DashCourseCard 
+                course={item}
+                selectedTerm={selectedTerm}
+                onPress={() => setSelectedCourse(item)}
+              />
+            );
+          }}
         />
       </View>
 

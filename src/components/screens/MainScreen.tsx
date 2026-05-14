@@ -10,7 +10,7 @@ import GPAView from './GPAView';
 import ArchiveView from './ArchiveView';
 //temp
 //const AttendanceView = () => <View style={{flex: 1}}><Text style={{color: 'white', padding: 20}}>Attendance</Text></View>;
-const LeaderboardView = () => <View style={{flex: 1}}><Text style={{color: 'white', padding: 20}}>Leaderboard</Text></View>;
+const RemindersView = () => <View style={{flex: 1}}><Text style={{color: 'white', padding: 20}}>Leaderboard</Text></View>;
 
 const TAB_ICONS: Record<TabId, any> = {
   settings: require('../../../assets/icons/settings.png'),
@@ -18,14 +18,14 @@ const TAB_ICONS: Record<TabId, any> = {
   dashboard: require('../../../assets/icons/home.png'),
   //attendance: require('../../../assets/icons/attendance.png'),
   gpa: require('../../../assets/icons/calculator.png'),
-  leaderboard: require('../../../assets/icons/trophy.png'),
+  reminders: require('../../../assets/icons/clock.png'),
 };
 
 interface MainScreenProps {
   data: AcademicData;
 }
 
-type TabId = 'dashboard' | 'gpa' | 'archive' | 'settings' | 'leaderboard'; //attendance?
+type TabId = 'dashboard' | 'gpa' | 'archive' | 'settings' | 'reminders'; //attendance?
 
 export default function MainScreen({ data }: MainScreenProps) {
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
@@ -48,7 +48,7 @@ export default function MainScreen({ data }: MainScreenProps) {
       case 'gpa': return <GPAView data={data} />;
       case 'archive': return <ArchiveView data={data}/>;
       case 'settings': return <SettingsView />;
-      case 'leaderboard': return <LeaderboardView />;
+      case 'reminders': return <RemindersView />;
       default: return <DashboardView data={data} />;
     }
   };
@@ -99,7 +99,7 @@ export default function MainScreen({ data }: MainScreenProps) {
         {renderTabButton('dashboard', 'Home', TAB_ICONS.dashboard)}
         {renderTabButton('gpa', 'GPA Calc.', TAB_ICONS.gpa)}
         {/* {renderTabButton('attendance', 'Attendance', TAB_ICONS.attendance)} */}
-        {renderTabButton('leaderboard', 'Leaderboard', TAB_ICONS.leaderboard, true)}
+        {renderTabButton('reminders', 'Reminders', TAB_ICONS.reminders, true)}
       </SafeAreaView>
     </View>
   );

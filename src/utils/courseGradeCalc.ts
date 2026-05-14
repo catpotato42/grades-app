@@ -20,7 +20,7 @@ export const calculateCourseGrade = (
       if (catAssigns.length > 0) {
         let earned = 0, possible = 0;
         catAssigns.forEach(a => {
-          const w = a.weight || 1;
+          const w = a.weight ?? 1;
           earned += (a.score! * w);
           possible += (a.totalPoints! * w);
         });
@@ -34,7 +34,7 @@ export const calculateCourseGrade = (
   } else {
     let earned = 0, possible = 0;
     validAssigns.forEach(a => {
-      const w = a.weight || 1;
+      const w = a.weight ?? 1;
       earned += (a.score! * w);
       possible += (a.totalPoints! * w);
     });

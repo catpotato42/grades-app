@@ -1,17 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput, ScrollView } from 'react-native';
 import Slider from '@react-native-community/slider';
-import { Assignment } from '../../types';
+import { Assignment, Course } from '../../types';
 
 interface AssignmentEditorProps {
   assignment: Assignment;
   originalAssignment?: Assignment;
+  course: Course;
   theme: any;
   onBack: () => void;
   onUpdateField: (field: 'score' | 'totalPoints', val?: number) => void;
 }
 
-export default function AssignmentEditor({ assignment, originalAssignment, theme, onBack, onUpdateField }: AssignmentEditorProps) {
+export default function AssignmentEditor({ assignment, originalAssignment, course, theme, onBack, onUpdateField }: AssignmentEditorProps) {
     const styles = createStyles(theme);
     const [scoreText, setScoreText] = React.useState(String(assignment.score ?? ""));
 
@@ -32,6 +33,8 @@ export default function AssignmentEditor({ assignment, originalAssignment, theme
         if (!isNaN(num)) onUpdateField('totalPoints', num);
     };
 
+    const categoryWeight = course.categoryWeights?.find(cw => cw.name === assignment.category)?.weight;
+
     return (
         <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.colors.background }]}>
         <Pressable onPress={onBack} style={styles.backButton}>
@@ -40,6 +43,10 @@ export default function AssignmentEditor({ assignment, originalAssignment, theme
         
         <View style={styles.editorContent}>
             <Text style={styles.editorTitle} numberOfLines={2}>{assignment.title}</Text>
+
+            <Text style={styles.categorySubtitle}>
+                {assignment.category}{categoryWeight !== undefined ? ` - ${categoryWeight * 100}%` : ''}
+            </Text>
             
             <View style={styles.editRow}>
             
@@ -124,6 +131,14 @@ const createStyles = (theme: any) => StyleSheet.create({
     color: theme.colors.textPrimary,
     fontFamily: theme.fonts.heading,
     fontSize: 16
+  },
+  categorySubtitle: { 
+    color: theme.colors.textSecondary,
+    fontSize: 16,
+    fontFamily: theme.fonts.heading,
+    textAlign: 'center',
+    marginBottom: 40,
+    marginTop: -30,
   },
   commentContainer: {
     width: '100%',

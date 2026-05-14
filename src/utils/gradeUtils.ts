@@ -13,7 +13,7 @@ export const useGradeColor = (num: number | null | undefined) => {
 
 export const getLetterGrade = (num: number | null | undefined): string => {
     if (num === undefined || num === null) return "—";
-    if (num >= 95) return "A+";
+    //if (num >= 95) return "A+";
     if (num >= 93) return "A";
     if (num >= 90) return "A-";
     if (num >= 87) return "B+";
