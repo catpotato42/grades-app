@@ -34,11 +34,16 @@ export default function DashboardView({ data }: DashboardProps) {
     const hasDataForSelected = termData && (termData.numeric !== undefined || termData.letter !== undefined);
     
     if (!hasDataForSelected && !settings.showClassesWithNoData) {
-      // Keep it if it had prior data in the current year (e.g., S1 course viewed in Q3)
-      const hasAnyPriorData = currentYearTermIds.some(id => 
-        course.officialGrades[id]?.numeric !== undefined || course.officialGrades[id]?.letter !== undefined
-      );
-      if (!hasAnyPriorData) return false;
+      if (data.provider === 'canvas') return false;
+
+      const selectedIndex = currentYearTermIds.indexOf(selectedTerm);
+      const hasAnyPriorData = selectedIndex > 0 && currentYearTermIds
+        .slice(0, selectedIndex)
+        .some(id => course.officialGrades[id] && (course.officialGrades[id].numeric !== undefined || course.officialGrades[id].letter !== undefined));
+        
+      if (!hasAnyPriorData) {
+        return false;
+      }
     }
     return true;
   });

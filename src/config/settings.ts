@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RemindersStore } from './remindersStore';
 
 const STORAGE_KEY = '@app_settings';
 
@@ -10,6 +11,9 @@ let settingsState = {
   colorblindMode: false,
   //unlockable
   darkMode: false,
+  //unlockable
+  remindersEnabled: false,
+  defaultReminderMinutes: 60,
 };
 
 const listeners = new Set<() => void>();
@@ -20,11 +24,11 @@ export const AppSettings = {
 
   subscribe: (listener: () => void) => {
     listeners.add(listener);
-    return () => listeners.delete(listener); // Cleanup
+    return () => listeners.delete(listener);
   },
 
   //saves, triggers update
-  update: async (key: keyof typeof settingsState, value: boolean) => {
+  update: async (key: keyof typeof settingsState, value: boolean | number) => {
     settingsState = { ...settingsState, [key]: value };
     listeners.forEach(listener => listener()); 
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(settingsState));

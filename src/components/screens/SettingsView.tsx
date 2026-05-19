@@ -1,5 +1,5 @@
 import React, { useSyncExternalStore } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../styles/theme';
 import { AppSettings } from '../../config/settings';
@@ -37,6 +37,27 @@ export default function SettingsView() {
                     theme={theme} 
                 />
             </View>
+            </View>
+
+            <Text style={styles.sectionHeader}>Reminders</Text>
+            <View style={styles.sectionContainer}>
+                <View style={styles.row}>
+                    <Text style={styles.rowLabel}>Enable Reminders</Text>
+                    <SmoothSwitch 
+                        value={settings.remindersEnabled}
+                        onValueChange={(val) => AppSettings.update('remindersEnabled', val)}
+                        theme={theme}
+                    />
+                </View>
+                <View style={[styles.row, { borderBottomWidth: 0 }]}>
+                    <Text style={styles.rowLabel}>Default Warning (Minutes)</Text>
+                    <TextInput
+                        style={[styles.rowLabel, { textAlign: 'right', flex: 1 }]}
+                        keyboardType="numeric"
+                        value={String(settings.defaultReminderMinutes)}
+                        onChangeText={(val) => AppSettings.update('defaultReminderMinutes', parseInt(val) || 0)}
+                    />
+                </View>
             </View>
 
             <Text style={styles.sectionHeader}>Customization</Text>

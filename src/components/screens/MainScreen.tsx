@@ -8,9 +8,9 @@ import DashboardView from './DashboardView';
 import SettingsView from './SettingsView';
 import GPAView from './GPAView';
 import ArchiveView from './ArchiveView';
+import RemindersView from './RemindersView';
 //temp
 //const AttendanceView = () => <View style={{flex: 1}}><Text style={{color: 'white', padding: 20}}>Attendance</Text></View>;
-const RemindersView = () => <View style={{flex: 1}}><Text style={{color: 'white', padding: 20}}>Leaderboard</Text></View>;
 
 const TAB_ICONS: Record<TabId, any> = {
   settings: require('../../../assets/icons/settings.png'),
@@ -48,7 +48,7 @@ export default function MainScreen({ data }: MainScreenProps) {
       case 'gpa': return <GPAView data={data} />;
       case 'archive': return <ArchiveView data={data}/>;
       case 'settings': return <SettingsView />;
-      case 'reminders': return <RemindersView />;
+      case 'reminders': return <RemindersView data={data}/>;
       default: return <DashboardView data={data} />;
     }
   };

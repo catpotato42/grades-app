@@ -33,28 +33,50 @@ async function fetchCourseDetails(domain: string, token: string, courseId: strin
       });
     }
 
+    const submissionMap: Record<string, any> = {};
+    rawSubmissions.forEach((sub: any) => {
+      submissionMap[String(sub.assignment_id)] = sub;
+    });
+
     const assignmentMap: Record<string, any> = {};
     rawAssignments.forEach((assign: any) => {
       assignmentMap[String(assign.id)] = assign;
     });
 
-    const assignments = rawSubmissions
-      .filter((sub: any) => sub.score !== null && sub.score !== undefined)
-      .map((sub: any): Assignment => {
-        const assignmentInfo = assignmentMap[String(sub.assignment_id)] || {};
-        
-        return {
-          id: String(sub.assignment_id),
-          title: assignmentInfo.name || 'Untitled Assignment',
-          category: groupMap[String(assignmentInfo.assignment_group_id)] || 'None', //Edge case - Assignment category on site is "None", screws up weights
-          termId: assignmentInfo.grading_period_id ? String(assignmentInfo.grading_period_id) : termId,
-          score: sub.score, 
-          totalPoints: assignmentInfo.points_possible ?? 0,
-          weight: assignmentInfo.omit_from_final_grade ? 0 : undefined,
-          date: assignmentInfo.due_at ?? undefined,
-          isMock: false
-        };
-      });
+    const assignments: Assignment[] = rawAssignments.map((a: any): Assignment => {
+      const sub = submissionMap[String(a.id)];
+      
+      //an assignment is "completed" if it's been submitted or graded
+      const isCompleted = sub?.workflow_state === 'submitted' || 
+                          sub?.workflow_state === 'graded';
+
+      return {
+        id: String(a.id),
+        title: a.name || 'Untitled Assignment',
+        category: groupMap[String(a.assignment_group_id)] || 'None',
+        termId: a.grading_period_id ? String(a.grading_period_id) : termId,
+        score: (sub?.score !== null && sub?.score !== undefined) 
+                ? sub.score 
+                : undefined,
+
+        totalPoints: a.points_possible ?? 0,
+        weight: a.omit_from_final_grade ? 0 : undefined,
+        date: a.due_at ?? undefined,
+        isCompleted: isCompleted,
+        isMock: false
+      };
+    });
+    //todo remove
+    const dummyAssignment: Assignment = {
+    id: `dummy-${courseId}`,
+    title: "Dummy Test Assignment",
+    category: "Test",
+    termId: termId,
+    totalPoints: 10,
+    date: new Date('2026-05-26T23:59:59').toISOString(),
+    };
+    assignments.push(dummyAssignment);
+    
     return { 
       assignments, 
       categoryWeights: isWeighted && categoryWeights.length > 0 ? categoryWeights : undefined 
@@ -87,7 +109,13 @@ export const CanvasProvider: PlatformProvider = {
     if (!response.ok) throw new Error("Failed to fetch Canvas courses.");
 
     const rawCourses = await response.json();
-    const activeCourses = rawCourses.filter((course: any) => !course.access_restricted_by_date);
+    
+    //restricted courses and Non-Course Sites filtered
+    const activeCourses = rawCourses.filter((course: any) => 
+      !course.access_restricted_by_date && 
+      course.term?.name !== "Non-Course Sites" &&
+      course.term?.name !== "Non-course sites"
+    );
 
     const baseTermsMap: Record<string, Term> = {};
     const subTermsMap: Record<string, Term> = {};
@@ -158,11 +186,18 @@ export const CanvasProvider: PlatformProvider = {
     });
     
     const allTerms = [...compiledBaseTerms, ...Object.values(subTermsMap)];
+
+    allTerms.sort((a, b) => {
+      const idA = parseInt(a.id) || 0;
+      const idB = parseInt(b.id) || 0;
+      return idA - idB;
+    });
     
-    //temporary fallback for currentTerm (we will refine this with date-checking later)
-    const currentTerm = allTerms.length > 0 ? allTerms[0].id : "1";
+    // Default to the rightmost (last) term in the array
+    const currentTerm = allTerms.length > 0 ? allTerms[allTerms.length - 1].id : "1";
 
     return {
+      provider: 'canvas',
       courses: mappedCourses,
       terms: allTerms.length > 0 ? allTerms : [{ id: "1", title: "Current Term" }],
       currentTerm: currentTerm

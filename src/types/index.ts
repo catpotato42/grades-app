@@ -20,6 +20,7 @@ export interface Assignment {
   weight?: number;
   date?: string;
   isMock?: boolean; //what-if or offset assignments
+  isCompleted?: boolean;
   comment?: string;
 }
 
@@ -65,4 +66,5 @@ export interface AcademicData {
   courses: Course[];
   studentName?: string;
   gpa?: number;
+  provider?: 'canvas' | 'skyward' | string;
 }

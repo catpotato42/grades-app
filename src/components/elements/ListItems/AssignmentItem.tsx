@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Assignment } from '../../../types';
+import BaseAssignmentItem from './BaseAssignmentItem';
 
 interface AssignmentItemProps {
   assignment: Assignment;
@@ -30,39 +31,29 @@ export default function AssignmentItem({ assignment, originalAssignment, isIgnor
     const styles = createStyles(theme);
 
     return (
-    <View style={styles.assignmentRow}>
-        {/* check mark */}
-        <TouchableOpacity onPress={() => onToggleIgnore(assignment.id)} style={styles.checkBox}>
-        {!isIgnored && <Text style={styles.checkText}>✓</Text>}
-        </TouchableOpacity>
-
-        {/* bar, text */}
-        <TouchableOpacity 
-        style={[styles.assignmentBar, { backgroundColor: barColor, opacity: isIgnored ? 0.6 : 1 }]}
+      <BaseAssignmentItem 
+        barColor={barColor}
+        opacity={isIgnored ? 0.6 : 1}
         onPress={() => onSelect(assignment)}
-        >
-        <Text style={styles.assignmentTitle} numberOfLines={1}>
-            {assignment.title}
-        </Text>
-        <Text style={styles.assignmentScore}>
+        leftContent={
+          <TouchableOpacity onPress={() => onToggleIgnore(assignment.id)} style={styles.checkBox}>
+            {!isIgnored && <Text style={styles.checkText}>✓</Text>}
+          </TouchableOpacity>
+        }
+        centerContent={
+          <Text style={styles.assignmentTitle} numberOfLines={1}>{assignment.title}</Text>
+        }
+        rightContent={
+          <Text style={styles.assignmentScore}>
             {isEdited ? `${origPercentage}% → ` : ''}
             {percentage !== null ? `${percentage}%` : '-%'}
-        </Text>
-        </TouchableOpacity>
-    </View>
+          </Text>
+        }
+      />
     );
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
-  assignmentBar: {
-    flex: 1, 
-    flexDirection: 'row', 
-    justifyContent: 'space-between',
-    alignItems: 'center', 
-    paddingVertical: 16, 
-    paddingHorizontal: 20, 
-    borderRadius: 14,
-  },
   assignmentRow: { 
     flexDirection: 'row',
     alignItems: 'center',
@@ -80,9 +71,14 @@ const createStyles = (theme: any) => StyleSheet.create({
     flex: 1 
   },
   checkBox: {
-    width: 24, height: 24, borderRadius: 4, borderWidth: 2,
-    borderColor: theme.colors.textSecondary, marginRight: 12,
-    alignItems: 'center', justifyContent: 'center',
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: theme.colors.textSecondary,
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   checkText: { 
     color: theme.colors.textPrimary, 
