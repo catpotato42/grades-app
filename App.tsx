@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useSyncExternalStore, useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useEffect } from 'react';
 
 import { SyncManager } from './src/services/syncManager';
 import PlatformSelectView, { PlatformId } from './src/components/screens/PlatformSelectView';
@@ -9,6 +8,9 @@ import CanvasLoginView from './src/components/screens/CanvasLoginView';
 
 import MainScreen from './src/components/screens/MainScreen';
 import { AcademicData } from './src/types';
+import { NotificationManager } from './src/services/notificationManager';
+import { RemindersStore } from './src/config/remindersStore';
+import { AppSettings } from './src/config/settings';
 
 import { 
   useFonts, 
@@ -26,6 +28,8 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [academicData, setAcademicData] = useState<AcademicData | null>(null);
   const [activePlatform, setActivePlatform] = useState<PlatformId | null>(null);
+  const remindersState = useSyncExternalStore(RemindersStore.subscribe, RemindersStore.getSnapshot);
+  const settingsState = useSyncExternalStore(AppSettings.subscribe, AppSettings.getSnapshot);
 
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_400Regular,
@@ -35,6 +39,23 @@ export default function App() {
     Inter_600SemiBold,
     Inter_800ExtraBold
   });
+
+  useEffect(() => {
+    //load saved settings and reminders on startup
+    const initStores = async () => {
+      await AppSettings.load();
+      await RemindersStore.load();
+      await NotificationManager.requestPermissions();
+    };
+    initStores();
+  }, []);
+
+  useEffect(() => {
+    if (academicData) {
+      NotificationManager.scheduleAlarms(academicData);
+    }
+    //add settingsState to dependencies so global toggle triggers a reschedule
+  }, [academicData, remindersState, settingsState]);
 
   useEffect(() => {
     const tryAutoLogin = async () => {

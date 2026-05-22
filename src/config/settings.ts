@@ -12,7 +12,7 @@ let settingsState = {
   //unlockable
   darkMode: false,
   //unlockable
-  remindersEnabled: false,
+  remindersEnabled: true,
   defaultReminderMinutes: 60,
 };
 
@@ -32,6 +32,12 @@ export const AppSettings = {
     settingsState = { ...settingsState, [key]: value };
     listeners.forEach(listener => listener()); 
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(settingsState));
+
+    if (key === 'remindersEnabled') {
+        if (!value) {
+           import('expo-notifications').then(n => n.cancelAllScheduledNotificationsAsync());
+        }
+    }
   },
 
   load: async () => {
