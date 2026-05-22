@@ -17,6 +17,18 @@ export default function RemindersView({ data }: { data: AcademicData }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempMinutes, setTempMinutes] = useState('');
 
+  if (!settings.remindersEnabled) {
+    return (
+      <SafeAreaView edges={['top']} style={styles.container}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontFamily: theme.fonts.heading, fontSize: 18, color: theme.colors.textPrimary }}>
+            Reminders are disabled
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const now = Date.now();
 
   //flatten all assignments, filter out completed/past ones, and sort by date
@@ -81,8 +93,7 @@ export default function RemindersView({ data }: { data: AcademicData }) {
                 <Text style={styles.modalBtnText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={saveTime} style={styles.modalBtn}>
-                {/* Fallback to #4CAF50 if gradeGreen doesn't exist */}
-                <Text style={[styles.modalBtnText, { color: theme.colors.gradeGreen || '#4CAF50' }]}>Save</Text>
+                <Text style={[styles.modalBtnText, { color: theme.colors.gradeGreen }]}>Save</Text>
               </TouchableOpacity>
             </View>
           </View>

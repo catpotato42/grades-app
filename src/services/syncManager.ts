@@ -14,5 +14,12 @@ export const SyncManager = {
     else throw new Error("Unknown platform.");
 
     return await provider.fetchData();
+  },
+
+  logout: async (): Promise<void> => {
+    //clear all platform data
+    await SecureStore.deleteItemAsync('ACTIVE_PLATFORM');
+    await SecureStore.deleteItemAsync('CANVAS_DOMAIN');
+    await SecureStore.deleteItemAsync('CANVAS_TOKEN');
   }
 };

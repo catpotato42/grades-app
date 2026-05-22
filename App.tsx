@@ -101,6 +101,13 @@ export default function App() {
     return <PlatformSelectView onSelectPlatform={setActivePlatform} />;
   };
 
+  const handleLogout = async () => {
+    await SyncManager.logout();
+    setAcademicData(null);
+    setActivePlatform(null);
+    setIsLoggedIn(false);
+  };
+
   return (
     <SafeAreaProvider>
       {renderContent()}

@@ -15,7 +15,7 @@ export const RemindersStore = {
 
   subscribe: (listener: () => void) => {
     listeners.add(listener);
-    return () => listeners.delete(listener); // Cleanup
+    return () => listeners.delete(listener); //cleanup
   },
 
   updateAssignment: async (id: string, settings: ReminderSettings) => {
