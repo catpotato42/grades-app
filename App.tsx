@@ -3,6 +3,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SyncManager } from './src/services/syncManager';
 import PlatformSelectView, { PlatformId } from './src/components/screens/PlatformSelectView';
+import CanvasSchoolSelectorView from './src/components/screens/CanvasSchoolSelectorView';
 import SkywardLoginView from './src/components/screens/SkywardLoginView';
 import CanvasLoginView from './src/components/screens/CanvasLoginView';
 
@@ -28,6 +29,7 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [academicData, setAcademicData] = useState<AcademicData | null>(null);
   const [activePlatform, setActivePlatform] = useState<PlatformId | null>(null);
+  const [selectedCanvasDomain, setSelectedCanvasDomain] = useState<string | null>(null);
   const remindersState = useSyncExternalStore(RemindersStore.subscribe, RemindersStore.getSnapshot);
   const settingsState = useSyncExternalStore(AppSettings.subscribe, AppSettings.getSnapshot);
 
@@ -69,7 +71,7 @@ export default function App() {
     };
 
     if (fontsLoaded && !isLoggedIn) {
-      tryAutoLogin();
+      //tryAutoLogin();
     }
   }, [fontsLoaded]);
 
@@ -90,11 +92,30 @@ export default function App() {
     }
 
     //if platform selected, show the selected platform
+
     if (activePlatform === 'skyward') {
       return <SkywardLoginView onLoginSuccess={handleLoginSuccess} />;
     }
+
     if (activePlatform === 'canvas') {
-      return <CanvasLoginView onLoginSuccess={handleLoginSuccess} />;
+      //step 1: If we don't have a domain yet, show the school selector
+      if (!selectedCanvasDomain) {
+        return (
+          <CanvasSchoolSelectorView
+            onSelectSchool={(domain) => setSelectedCanvasDomain(domain)} 
+            onCancel={() => setActivePlatform(null)} 
+          />
+        );
+      }
+
+      //step 2: Domain selected, show the login WebView
+      return (
+        <CanvasLoginView
+          domain={selectedCanvasDomain} 
+          onLoginSuccess={handleLoginSuccess} 
+          onCancel={() => setSelectedCanvasDomain(null)} //allows user to go back to school search
+        />
+      );
     }
 
     //default: select platform
@@ -102,10 +123,14 @@ export default function App() {
   };
 
   const handleLogout = async () => {
+    //let SyncManager handle the secure token deletion for whatever platform is active
     await SyncManager.logout();
+    
+    //clear all navigation and app UI states
+    setSelectedCanvasDomain(null); //clear the wizard state if Canvas was used
     setAcademicData(null);
-    setActivePlatform(null);
     setIsLoggedIn(false);
+    setActivePlatform(null);
   };
 
   return (
