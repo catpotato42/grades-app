@@ -10,7 +10,7 @@ export const SyncManager = {
 
     let provider;
     if (platform === 'SKYWARD') provider = SkywardProvider;
-    if (platform === 'CANVAS') provider = CanvasProvider;
+    else if (platform === 'CANVAS') provider = CanvasProvider;
     else throw new Error("Unknown platform.");
 
     return await provider.fetchData();
