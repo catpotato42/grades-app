@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../../styles/theme';
-import { BottomTabBar, BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
 
 export const CARD_PADDING = 16;
 
@@ -67,7 +66,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     position: 'relative',
   },
   centerContainer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
   },
