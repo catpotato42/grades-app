@@ -12,10 +12,14 @@ interface CanvasLoginProps {
   onCancel: () => void;
 }
 
-//stored in .env, only placeholder values for now
-const CANVAS_CLIENT_ID = process.env.EXPO_PUBLIC_CANVAS_CLIENT_ID; 
+//set these in .env; see .env.example. The OAuth flow needs a Canvas
+//developer key from the institution, which this project never obtained,
+//so these are unset and the screen below reports that rather than
+//loading Canvas with client_id=undefined.
+const CANVAS_CLIENT_ID = process.env.EXPO_PUBLIC_CANVAS_CLIENT_ID;
 const REDIRECT_URI = process.env.EXPO_PUBLIC_CANVAS_REDIRECT_URI;
 const BACKEND_URL = process.env.EXPO_PUBLIC_PROXY_URL;
+const IS_CONFIGURED = Boolean(CANVAS_CLIENT_ID && REDIRECT_URI && BACKEND_URL);
 
 const SCOPES = encodeURIComponent("url:GET|/api/v1/courses url:GET|/api/v1/courses/:course_id/assignments");
 
@@ -53,7 +57,7 @@ export default function CanvasLoginView({ domain, onLoginSuccess, onCancel }: Ca
     setError(null);
 
     try {
-      const response = await fetch(BACKEND_URL, {
+      const response = await fetch(BACKEND_URL!, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code, domain }),
@@ -74,7 +78,7 @@ export default function CanvasLoginView({ domain, onLoginSuccess, onCancel }: Ca
   const handleNavigationStateChange = (navState: any) => {
     const { url } = navState;
 
-    if (url.startsWith(REDIRECT_URI)) {
+    if (REDIRECT_URI && url.startsWith(REDIRECT_URI)) {
       // We look for ?code= instead of access_token=
       const codeMatch = url.match(/code=([^&]+)/);
       if (codeMatch && codeMatch[1]) {
@@ -87,7 +91,25 @@ export default function CanvasLoginView({ domain, onLoginSuccess, onCancel }: Ca
   };
 
   const authUrl = `https://${domain}/login/oauth2/auth?client_id=${CANVAS_CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=${SCOPES}`;
-  
+
+  if (!IS_CONFIGURED) {
+    return (
+      <View style={[styles.webviewContainer, styles.centerContent]}>
+        <Text style={styles.errorText}>Canvas login is not configured.</Text>
+        <Text style={styles.statusText}>
+          Set EXPO_PUBLIC_CANVAS_CLIENT_ID, EXPO_PUBLIC_CANVAS_REDIRECT_URI and
+          EXPO_PUBLIC_PROXY_URL in .env, then restart the dev server. See .env.example.
+        </Text>
+        <Text style={styles.statusText}>
+          Obtaining the client id requires a Canvas developer key from the institution.
+        </Text>
+        <TouchableOpacity style={[styles.retryButton, { marginTop: 24 }]} onPress={onCancel}>
+          <Text style={styles.retryText}>Go Back</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   if (loading) {
     return (
       <View style={[styles.webviewContainer, styles.centerContent]}>

@@ -22,7 +22,7 @@ export default function PlatformSelectView({ onSelectPlatform }: PlatformSelectP
   if (!isReady) return null;
 
   const platforms = [
-    { id: 'skyward' as PlatformId, name: 'Skyward', available: false },
+    { id: 'skyward' as PlatformId, name: 'Skyward', available: true },
     { id: 'canvas' as PlatformId, name: 'Canvas', available: true },
     { id: 'powerschool' as PlatformId, name: 'PowerSchool', available: false },
   ];

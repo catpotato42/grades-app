@@ -71,7 +71,7 @@ export default function App() {
     };
 
     if (fontsLoaded && !isLoggedIn) {
-      //tryAutoLogin();
+      tryAutoLogin();
     }
   }, [fontsLoaded]);
 
