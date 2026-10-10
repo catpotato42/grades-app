@@ -1,13 +1,26 @@
 import { Course, Assignment, AcademicData } from '../types';
 
+//Demo due dates, relative to the moment the app loads.
+const dueIn = (minutes: number) => new Date(Date.now() + minutes * 60000).toISOString();
+const hours = (h: number) => h * 60;
+const days = (d: number) => d * 24 * 60;
+
+//=== NOTIFICATION TEST ===============================================
+//Due date for "Unit 7 Test" in AP Calculus BC, in minutes from launch.
+//The reminder fires at (due date - minutesAhead), and the default
+//minutesAhead is 60, so 65 here means a notification about 5 minutes
+//after launch. Set 61 for roughly one minute. Anything under 60 is
+//already in the past and will not fire at all.
+const NOTIFY_TEST_MINUTES = 65;
+//=====================================================================
+
 export const MOCK_DATA: AcademicData = {
-  //gemini-generated mock data
-  currentTerm: "Q3-0",
+  //demo dataset; not real grades
+  currentTerm: "SP26",
   terms: [
-    { id: "Q1-0", title: "Q1", absences: 20 },
-    { id: "Q2-0", title: "Q2" },
-    { id: "S1-0", title: "S1", subTermIds: ["Q1-0", "Q2-0"] },
-    { id: "Q3-0", title: "Q3", absences: 1 },
+    { id: "FA25", title: "Fall 2025" },
+    { id: "SP26", title: "Spring 2026" },
+    { id: "AY25", title: "2025-26", subTermIds: ["FA25", "SP26"] },
   ],
   courses: [
     // --- PAST COURSES ---
@@ -26,7 +39,7 @@ export const MOCK_DATA: AcademicData = {
       title: "Chemistry",
       credits: 1.0,
       finalGrade: { numeric: 84, letter: "B" },
-      teacher: "Walter White",
+      teacher: "Marie Alvarez",
       termTitle: "10th Grade",
       officialGrades: {},
       assignments: [],
@@ -54,9 +67,9 @@ export const MOCK_DATA: AcademicData = {
     },
     {
       id: "bull-noth",
-      title: "AP Nothing",
+      title: "AP Human Geography",
       credits: 1.0,
-      teacher: "Jerry Standhaven",
+      teacher: "Tom Becker",
       termTitle: "9th Grade",
       officialGrades: {},
       assignments: [],
@@ -66,7 +79,7 @@ export const MOCK_DATA: AcademicData = {
       title: "Biology",
       credits: 1.0,
       finalGrade: { numeric: 88, letter: "B+" },
-      teacher: "Hugh Grant",
+      teacher: "Linda Park",
       termTitle: "9th Grade",
       officialGrades: {},
       assignments: [],
@@ -84,73 +97,79 @@ export const MOCK_DATA: AcademicData = {
     },
     // --- CURRENT COURSES ---
     {
-      id: "math-302",
-      title: "AP Calculus BC",
+      id: "cs-383",
+      title: "Theory of Computation",
       credits: 1.0,
-      teacher: "Robert Miller",
-      period: 1,
+      teacher: "Arlo Whitfield",
       categoryWeights: [
-        { name: "Test", weight: 0.6 },
-        { name: "Quiz", weight: 0.3 },
-        { name: "Homework", weight: 0.1 }
+        { name: "Exams", weight: 0.6 },
+        { name: "Problem Sets", weight: 0.3 },
+        { name: "Quizzes", weight: 0.1 }
       ],
       officialGrades: {
-        "Q1-0": { numeric: 94, letter: "A" },
-        "Q2-0": { numeric: 91, letter: "A-" },
-        "S1-0": { numeric: 93, letter: "A" },
-        "Q3-0": { numeric: 89, letter: "B+" }
+        "FA25": { numeric: 91, letter: "A-" },
+        "AY25": { numeric: 90, letter: "A-" },
+        "SP26": { numeric: 90, letter: "A-" }
       },
+      //graded work reconciles with the official grade, so no offset here
       assignments: [
-        { id: 'calc-1', title: 'Unit 6 Test', category: 'Test', score: 85, totalPoints: 100, termId: "Q3-0", comment: "Good job broski\n\n\n\n\n\n\n\n\n\nscroll test" },
-        { id: 'calc-2', title: 'Integration Quiz', category: 'Quiz', score: 14, totalPoints: 15, termId: "Q3-0" },
-        { id: 'calc-3', title: 'HW #12', category: 'Homework', score: 10, totalPoints: 10, termId: "Q3-0" }
+        { id: 'toc-1', title: 'Midterm 2', category: 'Exams', score: 85, totalPoints: 100, termId: "SP26", comment: "Clean reduction on problem 3. See me about the last one." },
+        { id: 'toc-2', title: 'Pumping Lemma Quiz', category: 'Quizzes', score: 14, totalPoints: 15, termId: "SP26" },
+        { id: 'toc-3', title: 'Problem Set 9', category: 'Problem Sets', score: 10, totalPoints: 10, termId: "SP26" },
+        //upcoming, ungraded: these drive the Reminders tab and the scheduled notifications
+        { id: 'toc-4', title: 'Final Exam', category: 'Exams', totalPoints: 100, termId: "SP26", date: dueIn(NOTIFY_TEST_MINUTES) },
+        { id: 'toc-5', title: 'Problem Set 10', category: 'Problem Sets', totalPoints: 10, termId: "SP26", date: dueIn(hours(26)) },
+        { id: 'toc-6', title: 'Turing Machines Quiz', category: 'Quizzes', totalPoints: 15, termId: "SP26", date: dueIn(days(4)) }
       ]
     },
     {
-      id: "soc-401",
-      title: "AP US Government",
-      credits: 0.5, // <-- Set to 0.5 to test half-credit GPA weighting
-      teacher: "Sarah Jenkins",
-      period: 2,
+      id: "engr-270",
+      title: "Analog and Digital Electronics",
+      credits: 1.0,
+      teacher: "Dana Ruiz",
       categoryWeights: [
-        { name: "Tests", weight: 0.7 },
+        { name: "Exams", weight: 0.7 },
         { name: "Labs", weight: 0.3 }
       ],
       officialGrades: {
-        "Q1-0": { numeric: 98, letter: "A" },
-        "Q2-0": { numeric: 65, letter: "D-" },
-        "S1-0": { numeric: 90, letter: "A-" },
-        "Q3-0": { numeric: 94, letter: "A" }
+        "FA25": { numeric: 88, letter: "B+" },
+        "AY25": { numeric: 91, letter: "A-" },
+        "SP26": { numeric: 94, letter: "A" }
       },
-      absences: 10,
+      //official grade sits well above the graded work, so the offset assignment
+      //appears to reconcile them (weighting the API does not expose)
       assignments: [
-        { id: 'gov-1', title: 'Constitution Test', category: 'Tests', score: 70, totalPoints: 100, termId: "Q3-0" },
-        { id: 'gov-2', title: 'Bill of Rights Lab', category: 'Labs', score: 26, totalPoints: 30, termId: "Q3-0" }
+        { id: 'ade-1', title: 'Midterm Exam', category: 'Exams', score: 70, totalPoints: 100, termId: "SP26" },
+        { id: 'ade-2', title: 'Op-Amp Lab', category: 'Labs', score: 26, totalPoints: 30, termId: "SP26" },
+        { id: 'ade-3', title: 'Filter Design Lab', category: 'Labs', totalPoints: 40, termId: "SP26", date: dueIn(days(2)) },
+        { id: 'ade-4', title: 'Lab Practical', category: 'Exams', totalPoints: 100, termId: "SP26", date: dueIn(days(6)) }
       ]
     },
     {
-      id: "eng-301",
-      title: "AP English Lang (APLA)",
+      id: "cs-347",
+      title: "Intro to Machine Learning",
       credits: 1.0,
-      teacher: "David Attenborough",
-      period: 3,
+      teacher: "Priya Raman",
       officialGrades: {
-        "Q1-0": { numeric: 84, letter: "B" },
-        "Q2-0": {},
-        "S1-0": { numeric: 84 },
-        "Q3-0": { numeric: 81 }
+        "FA25": { numeric: 84, letter: "B" },
+        "AY25": { numeric: 84 },
+        "SP26": { numeric: 81 }
       },
-      assignments: []
+      //a grade with no graded work behind it, so the offset assignment
+      //calibrates against it rather than showing nothing
+      assignments: [
+        { id: 'ml-1', title: 'Gradient Descent Writeup', category: 'None', totalPoints: 50, termId: "SP26", date: dueIn(days(3)) }
+      ]
     },
     {
-      id: "hth-101",
-      title: "Health",
-      credits: 0.5,
-      period: 6,
+      id: "math-260",
+      title: "Intro to Higher Math",
+      credits: 1.0,
+      teacher: "Emeka Boateng",
+      //no Spring grade posted yet, so this one shows the "no data" state
       officialGrades: {
-        "Q1-0": { numeric: 100, letter: "A+" },
-        "Q2-0": { numeric: 99, letter: "A+" },
-        "S1-0": { numeric: 100, letter: "A+" }
+        "FA25": { numeric: 93, letter: "A" },
+        "AY25": { numeric: 93, letter: "A" }
       },
       assignments: []
     }

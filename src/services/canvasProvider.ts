@@ -66,17 +66,6 @@ async function fetchCourseDetails(domain: string, token: string, courseId: strin
         isMock: false
       };
     });
-    //todo remove
-    const dummyAssignment: Assignment = {
-      id: `dummy-${courseId}`,
-      title: "Dummy Test Assignment",
-      category: "Test",
-      termId: termId,
-      totalPoints: 10,
-      date: new Date(Date.now() + 120000).toISOString(),
-    };
-    assignments.push(dummyAssignment);
-
     return { 
       assignments, 
       categoryWeights: isWeighted && categoryWeights.length > 0 ? categoryWeights : undefined 
